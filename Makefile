@@ -30,6 +30,9 @@ requirements:
 save_requirements: 
 	$(PYTHON_INTERPRETER) -m pip freeze > requirements.txt
 
+## Pull data from coronaBreakSuck2020
+pull_data:
+	cp -r ../coronaBreakSuck2020/data/topicmodels ./data/
 
 image:
 	docker build -t coronaBreakSuck2020Dash .

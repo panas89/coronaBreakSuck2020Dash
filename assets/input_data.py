@@ -5,6 +5,8 @@ import datetime
 import pickle
 import pyLDAvis.gensim
 
+TOPIC_MODELLING_PATH = './data/topicmodels/'
+
 COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country',
                 'location_country', 'risk_factor_topic', 'risk_factor_topic_kw',
                 'diagnostic_topic', 'diagnostic_topic_kw',
@@ -24,7 +26,7 @@ COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_countr
                 'outcome_common_name_topic', 'outcome_common_name_topic_kw',
                 'clinical_outcome_topic', 'clinical_outcome_topic_kw']
 
-df = pd.read_csv('./data/pcf_topic_data.csv',parse_dates=True,usecols=COLS_TO_READ)
+df = pd.read_csv(TOPIC_MODELLING_PATH+'pcf_topic_data.csv',parse_dates=True,usecols=COLS_TO_READ)
 
 table_cols = ['title', 'abstract', 'publish_time', 
               'affiliations_country', 'location_country']
@@ -39,7 +41,7 @@ df['times_str'] = [str(time_point)[:10] for time_point in df['publish_time']]
 
 classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
 
-class_sub_class = 'risk_factor_topic'
+class_sub_class = 'diagnostic_topic'
 class_sub_class_kw = class_sub_class + '_kw'
 
 # print(df.loc[df[class_sub_class]==1,'times_str'].groupby(df["times_str"]).count().index.values)
@@ -56,21 +58,24 @@ classes_topics_descr = {class_sub_class:{'topic_' + str(topic) :
                                             {'name':'Topic ' + str(topic+1), 
                                              'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
                                              'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
-                                             'keywords':df.loc[df[class_sub_class]==topic,class_sub_class_kw].unique()[0].split(', ')}
+                                             'keywords':df.loc[df[class_sub_class]==topic,class_sub_class + '_kw'].unique()[0].split(', ')}
                                         for topic in df[class_sub_class].unique() if topic != -1}
                             for class_sub_class in classes_sub_classes
                         }
 
-topics_descr = {'topic_' + str(topic) : {'name':'Topic ' + str(topic+1), 
-                'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
-                'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
-                'keywords':df.loc[df[class_sub_class]==topic,class_sub_class_kw].unique()[0].split(', ')}
-                 for topic in unique_topics if topic != -1}
+# topics_descr = {'topic_' + str(topic) : {'name':'Topic ' + str(topic+1), 
+#                 'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
+#                 'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
+#                 'keywords':df.loc[df[class_sub_class]==topic,class_sub_class_kw].unique()[0].split(', ')}
+#                  for topic in unique_topics if topic != -1}
 
 
 
 time_diff = (df['publish_time'].max()-df['publish_time'].min()).days
 print(df.shape)
+print(df.loc[df[class_sub_class]==0,class_sub_class_kw].unique())
+print(df.loc[df[class_sub_class]==1,class_sub_class_kw].unique())
+
 # print(str(df['publish_time'].min())[:10])
 # print(str(df['publish_time'].min()+ datetime.timedelta(days=1)))
 # print((df['publish_time'].max()-df['publish_time'].min()).days)
@@ -110,5 +115,5 @@ dates_rec , rec_data = preprocCases(df=df_rec,non_date_cols=non_date_cols)
 # print(inc_data)
 
 # read visualization
-with open('./data/vis.pickle', 'rb') as mod:
-    vis = pickle.load(mod)
+# with open(TOPIC_MODELLING_PATH+class_sub_class.replace('_topic','')+'/vis.pickle', 'rb') as mod:
+#     vis = pickle.load(mod)
