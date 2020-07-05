@@ -1,8 +1,17 @@
 import flask
 import dash
 import dash_bootstrap_components as dbc
-import dash_html_components as html
 import plotly.graph_objs as gobs
+from components.core_components import *
+from components.components_utils import *
+# import sys
+# sys.path.append("..")
+from assets.input_data import *
+from callbacks.callbacks import *
+from dash.dependencies import Input, Output
+import dash_dangerously_set_inner_html
+import plotly
+
 
 external_stylesheets = ['https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css']
 
@@ -42,6 +51,12 @@ header = dbc.NavbarSimple(
     dark=True
 )
 
+# Data
+# ==========
+
+# read data.
+
+
 
 # COMPONENTS
 # ==========
@@ -54,13 +69,77 @@ header = dbc.NavbarSimple(
 
 # Your interaction goes here.
 
-
 # APP LAYOUT
 # ==========
 
 app.layout = html.Div([
-    header
-])
+                        header,
+                        class_loc,
+                        pb_time,
+                        class_grouped_topic,
+                        proj_button,
+                        topic_dist_vis,
+                        # topic_word_clouds,
+                        inc_death_rec_plots,
+                        # topic_vis,
+                        topic_dd,
+                        paper_table
+                        ])
+
+
+# Callbacks
+# =========
+
+
+@app.callback(
+    [Output('topic-dist', 'figure'),
+     Output('topic-vis', 'srcDoc'),
+     Output('classes-grouped-hist', 'children')],
+    [Input('class-sub-class-drop-down', 'value'),
+     Input('pub-date-slider', 'value')])
+def update_by_subclass(class_sub_class,times):
+
+    times = pd.to_datetime([str(df['publish_time'].min() \
+                        + datetime.timedelta(days=time_point))[:10] \
+                         for time_point in times])
+
+    df_times = df.loc[df['publish_time'].between(times[0],times[1]),:].reset_index(drop=True)
+
+    classes_topics_descr = getClassesDescriptionMap(df_times)
+
+    topics_descr = classes_topics_descr[class_sub_class]
+
+    fig_dist = getTopicFig(class_sub_class,topics_descr)
+
+    vis_obj = getVis(class_sub_class)
+
+    grouped_hist = getGroupedHist(classes_topics_descr,classes_sub_classes)
+
+    return fig_dist,vis_obj,grouped_hist
+
+
+@app.callback(
+    [Output('table-papers', 'children'),
+     Output('topic-drop-down', 'options')],
+    [Input('class-sub-class-drop-down', 'value'),
+     Input('topic-drop-down', 'value'),
+     Input('pub-date-slider', 'value')])
+def update_by_topic(class_sub_class,topic,times):
+
+    times = pd.to_datetime([str(df['publish_time'].min() \
+                        + datetime.timedelta(days=time_point))[:10] \
+                         for time_point in times])
+
+    df_times = df.loc[df['publish_time'].between(times[0],times[1]),:].reset_index(drop=True)
+
+    classes_topics_descr = getClassesDescriptionMap(df_times)
+
+    children = getPapers(class_sub_class,topic,df_times)
+
+    options = getDropDownTopics(classes_topics_descr,class_sub_class)
+
+    return children,options
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
