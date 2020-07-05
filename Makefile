@@ -27,8 +27,8 @@ requirements:
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
 ## Save current requirements
-save_requirements: 
-	$(PYTHON_INTERPRETER) -m pip freeze > requirements.txt
+freeze:
+	pip freeze | grep -v "pkg-resources" > requirements.txt
 
 ## Pull data from coronaBreakSuck2020
 pull_data:
