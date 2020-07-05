@@ -7,8 +7,8 @@ import dash_table
 
 from .components_utils import *
 
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 from assets.input_data import *
 
 class_sub_class_dd = html.Div([
@@ -42,10 +42,6 @@ topic_dd = html.Div([
                 html.Label('Topic'),
                 dcc.Dropdown(
                     id='topic-drop-down',
-                    # options=[
-                    #     {'label': classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name'], \
-                    #          'value': classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name']} for topic_num in range(len(classes_topics_descr[class_sub_class]))
-                    # ],
                     value='Topic 1'
                 )  
             ], style={'width': '48%',
@@ -64,7 +60,7 @@ pb_time = html.Div([
                     id='pub-date-slider',
                     min=0,
                     max=time_diff,
-                    value=[0,10],
+                    value=[0,time_diff],
                     marks={time_point : \
                             str(df['publish_time'].min() \
                         + datetime.timedelta(days=time_point))[:10] \
@@ -231,9 +227,9 @@ paper_table = html.Div(
 #                    )
 
 
-class_stacked_topic = html.Div([
-                                dcc.Graph(figure=getStackedBarChart(classes_topics_descr,classes_sub_classes))
-                                ]
-                        , style={'width': '100%',
-                                'height': '100%',
-                                'display': 'inline-block'})
+class_grouped_topic = html.Div(
+                                id='classes-grouped-hist'
+                                , style={'width': '100%',
+                                        'height': '100%',
+                                        'display': 'inline-block'}
+                                )

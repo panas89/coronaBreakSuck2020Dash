@@ -4,9 +4,10 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as gobs
 from components.core_components import *
 from components.components_utils import *
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 from assets.input_data import *
+from callbacks.callbacks import *
 from dash.dependencies import Input, Output
 import dash_dangerously_set_inner_html
 import plotly
@@ -75,7 +76,7 @@ app.layout = html.Div([
                         header,
                         class_loc,
                         pb_time,
-                        class_stacked_topic,
+                        class_grouped_topic,
                         proj_button,
                         topic_dist_vis,
                         # topic_word_clouds,
@@ -92,98 +93,50 @@ app.layout = html.Div([
 
 @app.callback(
     [Output('topic-dist', 'figure'),
-     Output('topic-vis', 'srcDoc')],
-    [Input('class-sub-class-drop-down', 'value')])
-def update_figure(class_sub_class):
+     Output('topic-vis', 'srcDoc'),
+     Output('classes-grouped-hist', 'children')],
+    [Input('class-sub-class-drop-down', 'value'),
+     Input('pub-date-slider', 'value')])
+def update_by_subclass(class_sub_class,times):
+
+    times = pd.to_datetime([str(df['publish_time'].min() \
+                        + datetime.timedelta(days=time_point))[:10] \
+                         for time_point in times])
+
+    df_times = df.loc[df['publish_time'].between(times[0],times[1]),:].reset_index(drop=True)
+
+    classes_topics_descr = getClassesDescriptionMap(df_times)
 
     topics_descr = classes_topics_descr[class_sub_class]
 
-    fig_dist = dict(
-                data=[
-                    dict(
-                        x=topics_descr['topic_'+str(topic_num)]['times'],
-                        y=topics_descr['topic_'+str(topic_num)]['counts'],
-                        name=topics_descr['topic_'+str(topic_num)]['name']
-                    ) for topic_num in range(len(topics_descr))
-                ],
-                layout=dict(
-                    title=class_sub_class.replace('topic','').replace('_',' ').capitalize() + ' - Topic distribution',
-                    showlegend=True,
-                    legend=dict(
-                        x=0,
-                        y=1.0
-                    ),
-                    margin=dict(l=40, r=0, t=40, b=30)
-                )
-            )
+    fig_dist = getTopicFig(class_sub_class,topics_descr)
 
-    # fig_wcloud = [dcc.Graph(figure=wordCloudFigure(topics_descr['topic_'+str(topic_num)]),
-    #                                     style={'width': '30%',
-    #                                            'padding': '0px 0px 0px 0px',
-    #                                            'display': 'inline-block'})
-    #                                 for topic_num in range(len(topics_descr))]
+    vis_obj = getVis(class_sub_class)
 
-    # read visualization
-    with open(TOPIC_MODELLING_PATH+class_sub_class.replace('_topic','')+'/vis.pickle', 'rb') as mod:
-        vis = pickle.load(mod)
+    grouped_hist = getGroupedHist(classes_topics_descr,classes_sub_classes)
 
-
-    vis_obj = pyLDAvis.prepared_data_to_html(vis)
-
-    return fig_dist,vis_obj
+    return fig_dist,vis_obj,grouped_hist
 
 
 @app.callback(
     [Output('table-papers', 'children'),
      Output('topic-drop-down', 'options')],
     [Input('class-sub-class-drop-down', 'value'),
-     Input('topic-drop-down', 'value')])
-def update_by_topic(class_sub_class,topic):
+     Input('topic-drop-down', 'value'),
+     Input('pub-date-slider', 'value')])
+def update_by_topic(class_sub_class,topic,times):
 
-    topics_descr = classes_topics_descr[class_sub_class]
+    times = pd.to_datetime([str(df['publish_time'].min() \
+                        + datetime.timedelta(days=time_point))[:10] \
+                         for time_point in times])
 
-    df_papers = df.loc[df[class_sub_class]==int(topic[-1])-1,table_cols].reset_index(drop=True)
+    df_times = df.loc[df['publish_time'].between(times[0],times[1]),:].reset_index(drop=True)
 
-    children = [dash_table.DataTable(
-                                        data=df_papers.to_dict('records'),
-                                        columns=[{'id': c, 'name': c} for c in table_cols],
-                                        page_size=10,
+    classes_topics_descr = getClassesDescriptionMap(df_times)
 
-                                        style_cell={
-                                                    'overflow': 'hidden',
-                                                    'textOverflow': 'ellipsis',
-                                                    'maxWidth': 0,
-                                                },
-                                                tooltip_data=[
-                                                    {
-                                                        column: {'value': str(value), 'type': 'markdown'}
-                                                        for column, value in row.items()
-                                                    } for row in df_papers[table_cols].to_dict('rows')
-                                                ],
-                                        tooltip_duration=None,
+    children = getPapers(class_sub_class,topic,df_times)
 
-                                        style_cell_conditional=[
-                                            {
-                                                'if': {'column_id': c},
-                                                'textAlign': 'left'
-                                            } for c in ['Date', 'Region']
-                                        ],
-                                        style_data_conditional=[
-                                            {
-                                                'if': {'row_index': 'odd'},
-                                                'backgroundColor': 'rgb(248, 248, 248)'
-                                            }
-                                        ],
-                                        style_header={
-                                            'backgroundColor': 'rgb(230, 230, 230)',
-                                            'fontWeight': 'bold'
-                                        }
-                                    )]
-
-    options =[
-                {'label': classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name'], \
-                 'value': classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name']} for topic_num in range(len(classes_topics_descr[class_sub_class]))
-            ]
+    options = getDropDownTopics(classes_topics_descr,class_sub_class)
 
     return children,options
 

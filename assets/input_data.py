@@ -33,6 +33,10 @@ table_cols = ['title', 'abstract', 'publish_time',
 
 df['publish_time'] = pd.to_datetime(df['publish_time'])
 
+max_date = pd.to_datetime("today")
+
+df.loc[df['publish_time']>max_date,'publish_time'] = max_date
+
 df['times_str'] = [str(time_point)[:10] for time_point in df['publish_time']]
 
 # print(df['publish_time'].groupby(df["publish_time"].dt.date).count())
@@ -41,45 +45,28 @@ df['times_str'] = [str(time_point)[:10] for time_point in df['publish_time']]
 
 classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
 
-class_sub_class = 'diagnostic_topic'
-class_sub_class_kw = class_sub_class + '_kw'
+def getClassesDescriptionMap(df):
 
-# print(df.loc[df[class_sub_class]==1,'times_str'].groupby(df["times_str"]).count().index.values)
-# print(df.loc[df[class_sub_class]==1,'times_str'].groupby(df["times_str"]).count().values)
+    classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
 
+    classes_topics_descr = {class_sub_class:{'topic_' + str(topic) : 
+                                                {'name':'Topic ' + str(topic+1), 
+                                                'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
+                                                'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
+                                                'keywords':df.loc[df[class_sub_class]==topic,class_sub_class + '_kw'].unique()[0].split(', ')}
+                                            for topic in df[class_sub_class].unique() if topic != -1}
+                                for class_sub_class in classes_sub_classes
+                            }
+    return classes_topics_descr
 
-
-dist_topics = []
-
-unique_topics = df[class_sub_class].unique()
-
-
-classes_topics_descr = {class_sub_class:{'topic_' + str(topic) : 
-                                            {'name':'Topic ' + str(topic+1), 
-                                             'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
-                                             'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
-                                             'keywords':df.loc[df[class_sub_class]==topic,class_sub_class + '_kw'].unique()[0].split(', ')}
-                                        for topic in df[class_sub_class].unique() if topic != -1}
-                            for class_sub_class in classes_sub_classes
-                        }
-
-# topics_descr = {'topic_' + str(topic) : {'name':'Topic ' + str(topic+1), 
-#                 'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
-#                 'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
-#                 'keywords':df.loc[df[class_sub_class]==topic,class_sub_class_kw].unique()[0].split(', ')}
-#                  for topic in unique_topics if topic != -1}
-
+classes_topics_descr = getClassesDescriptionMap(df)
 
 
 time_diff = (df['publish_time'].max()-df['publish_time'].min()).days
 print(df.shape)
-print(df.loc[df[class_sub_class]==0,class_sub_class_kw].unique())
-print(df.loc[df[class_sub_class]==1,class_sub_class_kw].unique())
+print(time_diff)
+print(df['publish_time'].max())
 
-# print(str(df['publish_time'].min())[:10])
-# print(str(df['publish_time'].min()+ datetime.timedelta(days=1)))
-# print((df['publish_time'].max()-df['publish_time'].min()).days)
-# print([topics_descr['topic_'+str(t)] for t in range(len(topics_descr))])
 
 ##### incident cases
 
