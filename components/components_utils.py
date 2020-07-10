@@ -45,7 +45,7 @@ def getStackedBarChart(classes_topics_descr,classes_sub_classes,num_of_topics=20
         name_values = []
         for class_sub_class in classes_sub_classes:
             try:
-                values.append(classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['counts'].sum())
+                values.append(np.sum(classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['counts']))
                 name_values.append(classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name'])
             except:
                 values.append(0)
@@ -66,3 +66,77 @@ def getStackedBarChart(classes_topics_descr,classes_sub_classes,num_of_topics=20
     fig = go.Figure(data=bars)
 
     return fig
+
+
+def getRecoveriesFig(dates_rec,rec_data):
+    """Method to get recoveries timeseries"""
+    return dict(
+                data=[
+                    dict(
+                        x=dates_rec,
+                        y=rec_data,
+                        name='Recoveries',
+                        marker=dict(
+                            color='rgb(55, 83, 109)'
+                        )
+                    ),
+                ],
+                layout=dict(
+                    title='New Covid recoveries',
+                    showlegend=True,
+                    legend=dict(
+                        x=0,
+                        y=1.0
+                    ),
+                    margin=dict(l=40, r=0, t=40, b=30)
+                )
+            )
+
+
+def getIncFig(dates_inc,inc_data):
+    """Method to get incident timeseries"""
+    return dict(
+                data=[
+                    dict(
+                        x=dates_inc,
+                        y=inc_data,
+                        name='Positive cases',
+                        marker=dict(
+                            color='rgb(55, 83, 109)'
+                        )
+                    ),
+                ],
+                layout=dict(
+                    title='New Covid cases',
+                    showlegend=True,
+                    legend=dict(
+                        x=0,
+                        y=1.0
+                    ),
+                    margin=dict(l=40, r=0, t=40, b=30)
+                )
+            )
+
+def getDeathFig(dates_death,death_data):
+    """Method to get incident timeseries"""
+    return dict(
+                data=[
+                    dict(
+                        x=dates_death,
+                        y=death_data,
+                        name='Deaths',
+                        marker=dict(
+                            color='rgb(55, 83, 109)'
+                        )
+                    ),
+                ],
+                layout=dict(
+                    title='New Covid deaths',
+                    showlegend=True,
+                    legend=dict(
+                        x=0,
+                        y=1.0
+                    ),
+                    margin=dict(l=40, r=0, t=40, b=30)
+                )
+            )

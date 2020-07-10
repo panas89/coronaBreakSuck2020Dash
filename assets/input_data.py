@@ -45,21 +45,39 @@ df['times_str'] = [str(time_point)[:10] for time_point in df['publish_time']]
 
 classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
 
-def getClassesDescriptionMap(df):
+def getClassesDescriptionMap(df,resample_type):
 
     classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
 
     classes_topics_descr = {class_sub_class:{'topic_' + str(topic) : 
                                                 {'name':'Topic ' + str(topic+1), 
-                                                'times':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().index.values,
-                                                'counts':df.loc[df[class_sub_class]==topic,'times_str'].groupby(df["times_str"]).count().values,
+                                                'times':resampleTimeSeriesTimes(df.loc[df[class_sub_class]==topic,['times_str']],resample_type),
+                                                'counts':resampleTimeSeriesCounts(df.loc[df[class_sub_class]==topic,['times_str']],resample_type),
                                                 'keywords':df.loc[df[class_sub_class]==topic,class_sub_class + '_kw'].unique()[0].split(', ')}
                                             for topic in df[class_sub_class].unique() if topic != -1}
                                 for class_sub_class in classes_sub_classes
                             }
     return classes_topics_descr
 
-classes_topics_descr = getClassesDescriptionMap(df)
+def resampleTimeSeriesTimes(x,resample_type):
+    b = pd.DataFrame()
+    b['times_str'] = pd.to_datetime(x["times_str"].groupby(x["times_str"]).count().index.values)
+    b['counts'] = x["times_str"].groupby(x["times_str"]).count().values
+
+    b = b.set_index('times_str').resample(resample_type).sum()
+
+    # print([str(time_point)[:10] for time_point in b.index.values])
+    return [str(time_point)[:10] for time_point in b.index.values]
+
+def resampleTimeSeriesCounts(x,resample_type):
+    b = pd.DataFrame()
+    b['times_str'] = pd.to_datetime(x["times_str"].groupby(x["times_str"]).count().index.values)
+    b['counts'] = x["times_str"].groupby(x["times_str"]).count().values
+
+    b = b.set_index('times_str').resample(resample_type).sum()
+    return list(b.values.reshape(1,-1)[0])
+
+
 
 
 time_diff = (df['publish_time'].max()-df['publish_time'].min()).days
@@ -70,13 +88,23 @@ print(df['publish_time'].max())
 
 ##### incident cases
 
-def preprocCases(df,non_date_cols):
+def preprocCases(df,resample_type):
     """Method that returns difference of cases every day and dates."""
 
     non_date_cols = ['Province/State', 'Country/Region', 'Lat', 'Long']
     date_cols = [col for col in df.columns if col not in non_date_cols]
     dates = pd.to_datetime(date_cols)
     data = pd.Series([0]+list(df[date_cols].sum(axis=0))).diff()[1:]
+
+    x = pd.DataFrame()
+    x['times_str'] = dates
+    x['counts'] = data
+
+    x.fillna(0,inplace=True)
+
+    x = x.set_index('times_str').resample(resample_type).sum()
+    dates = [str(time_point)[:10] for time_point in x.index.values]
+    data = x['counts'].tolist()
 
     return dates,data
 
@@ -90,9 +118,7 @@ location_country = df_inc['Country/Region'].unique()
 
 
 
-dates_inc , inc_data = preprocCases(df=df_inc,non_date_cols=non_date_cols)
-dates_death , death_data = preprocCases(df=df_death,non_date_cols=non_date_cols)
-dates_rec , rec_data = preprocCases(df=df_rec,non_date_cols=non_date_cols)
+
 
 
 

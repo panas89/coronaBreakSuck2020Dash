@@ -4,7 +4,7 @@ from components.core_components import *
 from components.components_utils import *
 
 def getTopicFig(class_sub_class,topics_descr):
-
+    
     return dict(
                     data=[
                         dict(
@@ -16,6 +16,7 @@ def getTopicFig(class_sub_class,topics_descr):
                     layout=dict(
                         title=class_sub_class.replace('topic','').replace('_',' ').capitalize() + ' - Topic distribution',
                         showlegend=True,
+                        yaxis={'tickformat': ',d'},
                         legend=dict(
                             x=0,
                             y=1.0

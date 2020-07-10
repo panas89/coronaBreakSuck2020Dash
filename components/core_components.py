@@ -77,6 +77,24 @@ proj_button = html.Div([
                       'display': 'inline-block'})
 
 
+time_radio_buttons = html.Div([
+                                dcc.RadioItems(
+                                                options=[
+                                                    {'label': 'Daily', 'value': 'D'},
+                                                    {'label': 'Weekly', 'value': 'W'},
+                                                    {'label': 'Monthly', 'value': 'M'}
+                                                ],
+                                                value='D',
+                                                labelStyle={'padding': '25px 50px 50px 50px',
+                                                            'display': 'inline-block'},
+                                                style={'width': '100%',
+                                                        'padding': '25px 50px 50px 50px',
+                                                        'display': 'inline-block'},
+                                                id='time-rb'
+                                                 )  
+                                ]
+                                )
+
 topic_dist = html.Div([
                 dcc.Graph(
                         style={'height': 300},
@@ -88,27 +106,6 @@ topic_dist = html.Div([
 
 incident_cases = html.Div([
                 dcc.Graph(
-                        figure=dict(
-                            data=[
-                                dict(
-                                    x=dates_inc,
-                                    y=inc_data,
-                                    name='Positive cases',
-                                    marker=dict(
-                                        color='rgb(55, 83, 109)'
-                                    )
-                                ),
-                            ],
-                            layout=dict(
-                                title='New Covid cases',
-                                showlegend=True,
-                                legend=dict(
-                                    x=0,
-                                    y=1.0
-                                ),
-                                margin=dict(l=40, r=0, t=40, b=30)
-                            )
-                        ),
                         style={'height': 300},
                         id='covid-cases'
                     )  
@@ -118,27 +115,6 @@ incident_cases = html.Div([
 
 death_cases = html.Div([
                 dcc.Graph(
-                        figure=dict(
-                            data=[
-                                dict(
-                                    x=dates_death,
-                                    y=death_data,
-                                    name='Deaths',
-                                    marker=dict(
-                                        color='rgb(55, 83, 109)'
-                                    )
-                                ),
-                            ],
-                            layout=dict(
-                                title='New Covid deaths',
-                                showlegend=True,
-                                legend=dict(
-                                    x=0,
-                                    y=1.0
-                                ),
-                                margin=dict(l=40, r=0, t=40, b=30)
-                            )
-                        ),
                         style={'height': 300},
                         id='covid-deaths'
                     )  
@@ -148,27 +124,6 @@ death_cases = html.Div([
 
 recovery_cases = html.Div([
                 dcc.Graph(
-                        figure=dict(
-                            data=[
-                                dict(
-                                    x=dates_rec,
-                                    y=rec_data,
-                                    name='Recoveries',
-                                    marker=dict(
-                                        color='rgb(55, 83, 109)'
-                                    )
-                                ),
-                            ],
-                            layout=dict(
-                                title='New Covid recoveries',
-                                showlegend=True,
-                                legend=dict(
-                                    x=0,
-                                    y=1.0
-                                ),
-                                margin=dict(l=40, r=0, t=40, b=30)
-                            )
-                        ),
                         style={'height': 300},
                         id='covid-recoveries'
                     )  
