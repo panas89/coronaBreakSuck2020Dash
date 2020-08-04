@@ -68,6 +68,72 @@ def getStackedBarChart(classes_topics_descr,classes_sub_classes,num_of_topics=20
     return fig
 
 
+def getClassBarChart(classes_topics_descr,classes_sub_classes):
+    """Method to plot histogram of papers for each class, class name in x-axis."""
+    x_axis_vals = [class_sub_class.replace('_topic','').replace('_',' ').capitalize() for class_sub_class in classes_sub_classes]
+    y_axis_vals = []
+
+    for class_sub_class in classes_sub_classes:
+        values = []
+        for topic_num in range(len(classes_topics_descr[class_sub_class])):
+            values.append(np.sum(classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['counts']))
+        y_axis_vals.append(np.sum(values))                  
+
+    fig = go.Figure(data=go.Bar(
+                                x=x_axis_vals,
+                                y=y_axis_vals,
+                                marker_color =  colors
+                            ),
+                    layout=go.Layout(
+                                    title=go.layout.Title(text= "Class distribution"),
+                                    yaxis={'tickformat': ',d'},
+                                    title_x=0.5,
+                                    margin=dict(l=40, r=0, t=40, b=30),
+                                    )
+                    )
+
+    return fig
+
+def getTopicsBarChart(classes_topics_descr,class_sub_class):
+    """Method to plot bar chart of topics"""
+    x_axis_vals = [classes_topics_descr[class_sub_class]['topic_'+str(num)]['name'] for num,_ in enumerate(classes_topics_descr[class_sub_class])]
+    y_axis_vals = [np.sum(classes_topics_descr[class_sub_class]['topic_'+str(num)]['counts']) for num,_ in enumerate(classes_topics_descr[class_sub_class])]
+
+    fig = go.Figure(data=go.Bar(
+                                x=x_axis_vals,
+                                y=y_axis_vals,
+                                marker_color =  colors
+                            ),
+                    layout=go.Layout(
+                                    title=go.layout.Title(text= class_sub_class.replace('_topic','').replace('_',' ').capitalize() + " - Topic distribution"),
+                                    yaxis={'tickformat': ',d'},
+                                    title_x=0.5,
+                                    margin=dict(l=40, r=0, t=40, b=30)
+                                )
+                    )
+
+    return fig
+
+
+# def getTopicsBarChart(classes_topics_descr,class_sub_class):
+#     """Method to topics histogram, to have topic's name in x-axis."""
+#     x_axis_vals = [class_sub_class.replace('_topic','').replace('_',' ').capitalize() for class_sub_class in classes_sub_classes]
+#     y_axis_vals = []
+
+#     for class_sub_class in classes_sub_classes:
+#     values = []
+#     for topic_num in range(len(classes_topics_descr[class_sub_class])):
+#         values.append(np.sum(classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['counts']))
+#     y_axis_vals.append(np.sum(values))                  
+
+#     fig = go.Figure(data=go.Bar(
+#                                 x=x_axis_vals,
+#                                 y=y_axis_vals
+#                             )
+#                     )
+
+#     return fig
+
 def getRecoveriesFig(dates_rec,rec_data):
     """Method to get recoveries timeseries"""
     return dict(

@@ -21,6 +21,8 @@ endif
 # COMMANDS                                                                      #
 #################################################################################
 
+date_str = $(shell date +%Y-%m-%d -d "3 days ago")
+
 ## Install Python Dependencies
 requirements:
 	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
@@ -33,6 +35,11 @@ freeze:
 ## Pull data from coronaBreakSuck2020
 pull_data:
 	cp -r ../coronaBreakSuck2020/data/topicmodels ./data/
+	cp ../coronaBreakSuck2020/data/raw/$(date_str)/conf_global.csv ./data/
+	cp ../coronaBreakSuck2020/data/raw/$(date_str)/death_global.csv ./data/
+	cp ../coronaBreakSuck2020/data/raw/$(date_str)/recovered_global.csv ./data/
+	cp ../coronaBreakSuck2020/data/raw/$(date_str)/conf_USA.csv ./data/
+	cp ../coronaBreakSuck2020/data/raw/$(date_str)/death_USA.csv ./data/
 
 image:
 	docker build -t coronaBreakSuck2020Dash .

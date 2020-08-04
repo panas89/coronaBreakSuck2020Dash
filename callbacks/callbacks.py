@@ -14,14 +14,15 @@ def getTopicFig(class_sub_class,topics_descr):
                         ) for topic_num in range(len(topics_descr))
                     ],
                     layout=dict(
-                        title=class_sub_class.replace('topic','').replace('_',' ').capitalize() + ' - Topic distribution',
+                        title=class_sub_class.replace('topic','').replace('_',' ').capitalize() + ' - Topic time distribution',
                         showlegend=True,
                         yaxis={'tickformat': ',d'},
                         legend=dict(
                             x=0,
                             y=1.0
                         ),
-                        margin=dict(l=40, r=0, t=40, b=30)
+                        margin=dict(l=40, r=0, t=40, b=30),
+                        colorway =   colors
                     )
                 )
 
@@ -30,6 +31,16 @@ def getGroupedHist(classes_topics_descr,classes_sub_classes):
     return [
             dcc.Graph(figure=getStackedBarChart(classes_topics_descr,classes_sub_classes))
             ]
+
+def getClassHist(classes_topics_descr,classes_sub_classes):
+
+    return [
+            dcc.Graph(figure=getClassBarChart(classes_topics_descr,classes_sub_classes))
+            ]
+
+def getTopicsHist(classes_topics_descr,class_sub_class):
+
+    return getTopicsBarChart(classes_topics_descr,class_sub_class)
 
 def getVis(class_sub_class):
     # read visualization

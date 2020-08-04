@@ -77,7 +77,8 @@ app.layout = html.Div([
                         class_loc,
                         pb_time,
                         class_grouped_topic,
-                        proj_button,
+                        topic_dist,
+                        # proj_button,
                         time_radio_buttons,
                         topic_dist_vis,
                         # topic_word_clouds,
@@ -93,7 +94,8 @@ app.layout = html.Div([
 
 
 @app.callback(
-    [Output('topic-dist', 'figure'),
+    [Output('topic-time-dist', 'figure'),
+     Output('topic-dist', 'figure'),
      Output('topic-vis', 'srcDoc'),
      Output('classes-grouped-hist', 'children')],
     [Input('class-sub-class-drop-down', 'value'),
@@ -111,13 +113,15 @@ def update_by_subclass(class_sub_class,times,time_resample_type):
 
     topics_descr = classes_topics_descr[class_sub_class]
 
-    fig_dist = getTopicFig(class_sub_class,topics_descr)
+    fig_topic_time_dist = getTopicFig(class_sub_class,topics_descr)
 
     vis_obj = getVis(class_sub_class)
 
-    grouped_hist = getGroupedHist(classes_topics_descr,classes_sub_classes)
+    grouped_hist = getClassHist(classes_topics_descr,classes_sub_classes)#getGroupedHist(classes_topics_descr,classes_sub_classes)
 
-    return fig_dist,vis_obj,grouped_hist
+    topics_dist = getTopicsHist(classes_topics_descr,class_sub_class)
+
+    return fig_topic_time_dist,topics_dist,vis_obj,grouped_hist
 
 
 @app.callback(
@@ -164,4 +168,4 @@ def update_by_deaths_inc_rec(time_resample_type):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True)#, host='0.0.0.0')

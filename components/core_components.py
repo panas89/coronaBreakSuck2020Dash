@@ -19,7 +19,7 @@ class_sub_class_dd = html.Div([
                         {'label': class_sub_class.replace('_topic','').replace('_',' ').capitalize(),\
                              'value': class_sub_class} for class_sub_class in classes_sub_classes
                     ],
-                    value='disease_comorbidity_topic'
+                    value='risk_factor_topic'
                 )  
             ], style={'width': '48%',
                       'padding': '25px 50px 75px 50px',
@@ -95,12 +95,21 @@ time_radio_buttons = html.Div([
                                 ]
                                 )
 
+topic_time_dist = html.Div([
+                dcc.Graph(
+                        style={'height': 300},
+                        id='topic-time-dist',
+                    )  
+            ], style={'width': '100%',
+                'padding': '25px 50px 50px 50px',
+                'display': 'inline-block'})
+
 topic_dist = html.Div([
                 dcc.Graph(
                         style={'height': 300},
                         id='topic-dist'
                     )  
-            ], style={'width': '100%',
+            ], style={'width': '50%',
                 'padding': '25px 50px 50px 50px',
                 'display': 'inline-block'})
 
@@ -153,7 +162,8 @@ topic_vis = html.Div( html.Iframe(
                                  'display': 'inline-block'})
 
 topic_dist_vis = html.Div(
-                    [topic_dist,topic_vis]
+                    [topic_time_dist,
+                     topic_vis]
                     , style={'width': '100%',
                              'display': 'inline-block'})
 
@@ -184,7 +194,7 @@ paper_table = html.Div(
 
 class_grouped_topic = html.Div(
                                 id='classes-grouped-hist'
-                                , style={'width': '100%',
-                                        'height': '100%',
+                                , style={'width': '50%',
+                                        'padding': '25px 50px 50px 50px',
                                         'display': 'inline-block'}
                                 )
