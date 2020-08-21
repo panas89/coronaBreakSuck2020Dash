@@ -42,7 +42,8 @@ topic_dd = html.Div([
                 html.Label('Topic'),
                 dcc.Dropdown(
                     id='topic-drop-down',
-                    value='Topic 1'
+                    value=['Topic 1'],
+                    multi=True
                 )  
             ], style={'width': '48%',
                       'padding': '25px 50px 75px 50px',

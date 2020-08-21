@@ -21,7 +21,7 @@ endif
 # COMMANDS                                                                      #
 #################################################################################
 
-date_str = $(shell date +%Y-%m-%d -d "3 days ago")
+date_str = $(shell date +%Y-%m-%d -d "1 days ago")
 
 ## Install Python Dependencies
 requirements:

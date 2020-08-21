@@ -27,10 +27,11 @@ TOPIC_MODELLING_PATH = './data/topicmodels/'
 #                 'outcome_common_name_topic', 'outcome_common_name_topic_kw',
 #                 'clinical_outcome_topic', 'clinical_outcome_topic_kw']
 
-COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country',
+COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country','doi',
                 'location_country', 'risk_factor_topic', 'risk_factor_topic_kw',
                 # 'diagnostic_topic', 'diagnostic_topic_kw',
                 'treatment_and_vaccine_topic', 'treatment_and_vaccine_topic_kw',
+                'kidney_disease_topic', 'kidney_disease_topic_kw',
                 # 'outcome_topic', 'outcome_topic_kw', 'risk_factor_common_name_topic',
                 # 'risk_factor_common_name_topic_kw', 'gender_topic', 'gender_topic_kw',
                 # 'age_topic', 'age_topic_kw', 'disease_comorbidity_topic',
@@ -49,8 +50,10 @@ COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_countr
 
 df = pd.read_csv(TOPIC_MODELLING_PATH+'pcf_topic_data.csv',parse_dates=True,usecols=COLS_TO_READ)
 
+df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
+
 table_cols = ['title', 'abstract', 'publish_time', 
-              'affiliations_country', 'location_country']
+              'affiliations_country', 'location_country','doi']
 
 df['publish_time'] = pd.to_datetime(df['publish_time'])
 

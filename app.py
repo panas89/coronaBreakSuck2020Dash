@@ -131,7 +131,7 @@ def update_by_subclass(class_sub_class,times,time_resample_type):
      Input('topic-drop-down', 'value'),
      Input('pub-date-slider', 'value'),
      Input('time-rb', 'value')])
-def update_by_topic(class_sub_class,topic,times,time_resample_type):
+def update_by_topic(class_sub_class,topics,times,time_resample_type):
 
     times = pd.to_datetime([str(df['publish_time'].min() \
                         + datetime.timedelta(days=time_point))[:10] \
@@ -141,9 +141,11 @@ def update_by_topic(class_sub_class,topic,times,time_resample_type):
 
     classes_topics_descr = getClassesDescriptionMap(df_times,time_resample_type)
 
-    children = getPapers(class_sub_class,topic,df_times)
+    children = getPapers(class_sub_class,topics,df_times)
 
     options = getDropDownTopics(classes_topics_descr,class_sub_class)
+
+    values = [i['value'] for i in options]
 
     return children,options
 

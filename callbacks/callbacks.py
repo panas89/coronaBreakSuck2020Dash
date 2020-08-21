@@ -57,13 +57,21 @@ def getVis(class_sub_class):
     #                                 for topic_num in range(len(topics_descr))]s
 
 
-def getPapers(class_sub_class,topic,df):
-    df_papers = df.loc[df[class_sub_class]==int(topic[-1])-1,table_cols].reset_index(drop=True)
+def getPapers(class_sub_class,topics,df):
+    list_of_topics_ind = [int(topic[-1])-1 for topic in topics]
+    df_papers = df.loc[df[class_sub_class].isin(list_of_topics_ind),table_cols].reset_index(drop=True)
 
     return [dash_table.DataTable(
                                         data=df_papers.to_dict('records'),
-                                        columns=[{'id': c, 'name': c} for c in table_cols],
-                                        page_size=10,
+                                        columns=[{'id': c, 'name': c,"clearable": True, "renamable": True, "hideable": True, "deletable": True } for c in table_cols],
+                                        page_size=20,
+                                        export_format='xlsx',
+                                        export_headers='display',
+                                        editable=True,
+                                        css=[
+                                                {"selector": ".column-header--delete svg", "rule": 'display: "none"'},
+                                                {"selector": ".column-header--delete::before", "rule": 'content: "X"'}
+                                            ],
                                         filter_action='native',
 
                                         style_cell={
