@@ -1,37 +1,17 @@
-
 import pandas as pd
 import numpy as np
-import datetime
-import pickle
-import pyLDAvis.gensim
 
-TOPIC_MODELLING_PATH = './data/topicmodels/'
+# ######################################################################################################################
+TOPIC_MODELING_PATH = './data/topicmodels/pcf_topic_data.csv'
+INCIDENTS_PATH = './data/conf_global.csv'
+DEATHS_PATH = './data/death_global.csv'
+RECOVERED_PATH = './data/recovered_global.csv'
 
-# COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country',
-#                 'location_country', 'risk_factor_topic', 'risk_factor_topic_kw',
-#                 'diagnostic_topic', 'diagnostic_topic_kw',
-#                 'treatment_and_vaccine_topic', 'treatment_and_vaccine_topic_kw',
-#                 'outcome_topic', 'outcome_topic_kw', 'risk_factor_common_name_topic',
-#                 'risk_factor_common_name_topic_kw', 'gender_topic', 'gender_topic_kw',
-#                 'age_topic', 'age_topic_kw', 'disease_comorbidity_topic',
-#                 'disease_comorbidity_topic_kw', 'smoking_topic', 'smoking_topic_kw',
-#                 'exercise_topic', 'exercise_topic_kw',
-#                 # 'occupation_topic','occupation_topic_kw', 
-#                 'weather_topic', 'weather_topic_kw',
-#                 'diagnostic_common_name_topic', 'diagnostic_common_name_topic_kw',
-#                 'symptom_topic', 'symptom_topic_kw', 'imaging_diagnosis_topic',
-#                 'imaging_diagnosis_topic_kw', 'clinical_diagnosis_topic',
-#                 'clinical_diagnosis_topic_kw', 'genetic_diagnosis_topic',
-#                 'genetic_diagnosis_topic_kw', 'treatment_and_vaccine_common_name_topic',
-#                 'treatment_and_vaccine_common_name_topic_kw',
-#                 'outcome_common_name_topic', 'outcome_common_name_topic_kw',
-#                 'clinical_outcome_topic', 'clinical_outcome_topic_kw']
-
-COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country','doi',
+COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country',#'doi',
                 'location_country', 'risk_factor_topic', 'risk_factor_topic_kw',
                 # 'diagnostic_topic', 'diagnostic_topic_kw',
                 'treatment_and_vaccine_topic', 'treatment_and_vaccine_topic_kw',
-                'kidney_disease_topic', 'kidney_disease_topic_kw',
+                # 'kidney_disease_topic', 'kidney_disease_topic_kw',
                 # 'outcome_topic', 'outcome_topic_kw', 'risk_factor_common_name_topic',
                 # 'risk_factor_common_name_topic_kw', 'gender_topic', 'gender_topic_kw',
                 # 'age_topic', 'age_topic_kw', 'disease_comorbidity_topic',
@@ -48,116 +28,48 @@ COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_countr
                 # 'outcome_common_name_topic', 'outcome_common_name_topic_kw',
                 # 'clinical_outcome_topic', 'clinical_outcome_topic_kw']
 
-df = pd.read_csv(TOPIC_MODELLING_PATH+'pcf_topic_data.csv',parse_dates=True,usecols=COLS_TO_READ)
+TABLE_COLS = ['title', 'abstract', 'publish_time', 
+              'affiliations_country', 'location_country']#,'doi']
 
-df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
+CLASSES_SUBCLASSES = [col for col in COLS_TO_READ if 'topic' in col and 'kw' not in col]
 
-table_cols = ['title', 'abstract', 'publish_time', 
-              'affiliations_country', 'location_country','doi']
+MAX_DATE = pd.to_datetime("today")
+MAX_WEEK = MAX_DATE.isocalendar()[1]
 
-df['publish_time'] = pd.to_datetime(df['publish_time'])
-
-max_date = pd.to_datetime("today")
-
-df.loc[df['publish_time']>max_date,'publish_time'] = max_date
-
-df['times_str'] = [str(time_point)[:10] for time_point in df['publish_time']]
-
-# colors
-
-colors = ['#4285F4',
+COLORS = ['#4285F4',
           "#DB4437",
           "#F4B400",
           "#0F9D58",
           "#666666",
           "#FF00BF",
-          "#e6ab02",
-         ]
+          "#e6ab02"]
 
-classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
+# ----------------------------------------------------------------------------------------------------------------------
+def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
 
-def getClassesDescriptionMap(df,resample_type):
+    # Load data
+    df = pd.read_csv(file_path, parse_dates=['publish_time'], usecols=COLS_TO_READ)
 
-    classes_sub_classes = [col for col in df.columns if 'topic' in col and 'kw' not in col]
+    # Create DOI col
+    # df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
 
-    classes_topics_descr = {class_sub_class:{'topic_' + str(topic) : 
-                                                {'name':'Topic ' + str(topic+1), 
-                                                'times':resampleTimeSeriesTimes(df.loc[df[class_sub_class]==topic,['times_str']],resample_type),
-                                                'counts':resampleTimeSeriesCounts(df.loc[df[class_sub_class]==topic,['times_str']],resample_type),
-                                                'keywords':df.loc[df[class_sub_class]==topic,class_sub_class + '_kw'].unique()[0].split(', ')}
-                                            for topic in df[class_sub_class].unique() if topic != -1}
-                                for class_sub_class in classes_sub_classes
-                            }
-    return classes_topics_descr
+    # Create date col 
+    df['date'] = [date.strftime('%m-%d-%Y') for date in df['publish_time']]
 
-def resampleTimeSeriesTimes(x,resample_type):
-    b = pd.DataFrame()
-    b['times_str'] = pd.to_datetime(x["times_str"].groupby(x["times_str"]).count().index.values)
-    b['counts'] = x["times_str"].groupby(x["times_str"]).count().values
+    # Fix unknown/wrong publication datetimes to today   
+    df.loc[df['publish_time'] > max_date, 'publish_time'] = max_date
 
-    b = b.set_index('times_str').resample(resample_type).sum()
+    return df 
 
-    # print([str(time_point)[:10] for time_point in b.index.values])
-    return [str(time_point)[:10] for time_point in b.index.values]
+# ######################################################################################################################
 
-def resampleTimeSeriesCounts(x,resample_type):
-    b = pd.DataFrame()
-    b['times_str'] = pd.to_datetime(x["times_str"].groupby(x["times_str"]).count().index.values)
-    b['counts'] = x["times_str"].groupby(x["times_str"]).count().values
-
-    b = b.set_index('times_str').resample(resample_type).sum()
-    return list(b.values.reshape(1,-1)[0])
+# Load Data
+df = load_topic_modeling_data(file_path=TOPIC_MODELING_PATH, cols_to_read=COLS_TO_READ, max_date=MAX_DATE)
+df_inc = pd.read_csv(INCIDENTS_PATH, parse_dates=True) 
+df_death = pd.read_csv(DEATHS_PATH, parse_dates=True) 
+df_rec = pd.read_csv(RECOVERED_PATH, parse_dates=True) 
 
 
-
-
-time_diff = (df['publish_time'].max()-df['publish_time'].min()).days
-print(df.shape)
-print(time_diff)
-print(df['publish_time'].max())
-
-
-##### incident cases
-
-def preprocCases(df,resample_type):
-    """Method that returns difference of cases every day and dates."""
-
-    non_date_cols = ['Province/State', 'Country/Region', 'Lat', 'Long']
-    date_cols = [col for col in df.columns if col not in non_date_cols]
-    dates = pd.to_datetime(date_cols)
-    data = pd.Series([0]+list(df[date_cols].sum(axis=0))).diff()[1:] #difference per day in cases
-    
-    x = pd.DataFrame()
-    x['times_str'] = dates
-    x['counts'] = data
-
-    x.fillna(0,inplace=True)
-
-    x = x.set_index('times_str').resample(resample_type,label='right', closed='right').sum()
-    dates = [str(time_point)[:10] for time_point in x.index.values]
-    data = x['counts'].tolist()
-
-    return dates,data
-
-df_inc = pd.read_csv('./data/conf_global.csv',parse_dates=True)#,usecols=COLS_TO_READ)
-df_death = pd.read_csv('./data/death_global.csv',parse_dates=True)#,usecols=COLS_TO_READ)
-df_rec = pd.read_csv('./data/recovered_global.csv',parse_dates=True)#,usecols=COLS_TO_READ)
-non_date_cols = ['Province/State', 'Country/Region', 'Lat', 'Long']
-
-
-location_country = df_inc['Country/Region'].unique()
-
-
-
-
-
-
-
-# print(df_inc.head(3))
-# print(df_inc.columns)
-# assert(len(inc_data)==len(dates_inc))
-# print(inc_data)
-
-# read visualization
-# with open(TOPIC_MODELLING_PATH+class_sub_class.replace('_topic','')+'/vis.pickle', 'rb') as mod:
-#     vis = pickle.load(mod)
+# Global Definitions
+LOCATIONS_COUNTRIES = df_inc['Country/Region'].unique()
+TIME_DIFF = (df['publish_time'].max()-df['publish_time'].min()).days
