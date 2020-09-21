@@ -1,9 +1,9 @@
-
 from assets.input_data import *
 from components.core_components import *
 from components.components_utils import *
 
-def getTopicFig(class_sub_class,topics_descr):
+# ######################################################################################################################
+def getTopicFig(class_subclass, topics_descr):
     
     return dict(
                     data=[
@@ -14,7 +14,7 @@ def getTopicFig(class_sub_class,topics_descr):
                         ) for topic_num in range(len(topics_descr))
                     ],
                     layout=dict(
-                        title=class_sub_class.replace('topic','').replace('_',' ').capitalize() + ' - Topic time distribution',
+                        title= format_class_subclass(class_subclass) + ' - Topic time distribution',
                         showlegend=True,
                         yaxis={'tickformat': ',d'},
                         legend=dict(
@@ -22,92 +22,79 @@ def getTopicFig(class_sub_class,topics_descr):
                             y=1.0
                         ),
                         margin=dict(l=40, r=0, t=40, b=30),
-                        colorway =   colors
+                        colorway=COLORS
                     )
                 )
 
-def getGroupedHist(classes_topics_descr,classes_sub_classes):
+# ----------------------------------------------------------------------------------------------------------------------
+def getTopicsHist(classes_topics_descr, class_subclass):
 
-    return [
-            dcc.Graph(figure=getStackedBarChart(classes_topics_descr,classes_sub_classes))
-            ]
+    return getTopicsBarChart(classes_topics_descr, class_subclass)
 
-def getClassHist(classes_topics_descr,classes_sub_classes):
-
-    return [
-            dcc.Graph(figure=getClassBarChart(classes_topics_descr,classes_sub_classes))
-            ]
-
-def getTopicsHist(classes_topics_descr,class_sub_class):
-
-    return getTopicsBarChart(classes_topics_descr,class_sub_class)
-
-def getVis(class_sub_class):
-    # read visualization
-    with open(TOPIC_MODELLING_PATH+class_sub_class.replace('_topic','')+'/vis.pickle', 'rb') as mod:
-        vis = pickle.load(mod)
-
-    return pyLDAvis.prepared_data_to_html(vis)
-
-
-# fig_wcloud = [dcc.Graph(figure=wordCloudFigure(topics_descr['topic_'+str(topic_num)]),
-    #                                     style={'width': '30%',
-    #                                            'padding': '0px 0px 0px 0px',
-    #                                            'display': 'inline-block'})
-    #                                 for topic_num in range(len(topics_descr))]s
-
-
-def getPapers(class_sub_class,topics,df):
+# ----------------------------------------------------------------------------------------------------------------------
+def getPapers(class_subclass, topics, df):
     list_of_topics_ind = [int(topic[-1])-1 for topic in topics]
-    df_papers = df.loc[df[class_sub_class].isin(list_of_topics_ind),table_cols].reset_index(drop=True)
+    df_papers = df.loc[df[class_subclass].isin(list_of_topics_ind),TABLE_COLS].reset_index(drop=True)
 
     return [dash_table.DataTable(
-                                        data=df_papers.to_dict('records'),
-                                        columns=[{'id': c, 'name': c,"clearable": True, "renamable": True, "hideable": True, "deletable": True } for c in table_cols],
-                                        page_size=20,
-                                        export_format='xlsx',
-                                        export_headers='display',
-                                        editable=True,
-                                        css=[
-                                                {"selector": ".column-header--delete svg", "rule": 'display: "none"'},
-                                                {"selector": ".column-header--delete::before", "rule": 'content: "X"'}
-                                            ],
-                                        filter_action='native',
+                            data=df_papers.to_dict('records'),
+                            columns=[{'id': col, 
+                                      'name': col,
+                                      'clearable': True, 
+                                      'renamable': True, 
+                                      'hideable': True, 
+                                      'deletable': True} 
+                                     for col in TABLE_COLS
+                                     ],
+                            page_size=20,
+                            export_format='xlsx',
+                            export_headers='display',
+                            editable=True,
+                            css=[
+                                    {"selector": ".column-header--delete svg", "rule": 'display: "none"'},
+                                    {"selector": ".column-header--delete::before", "rule": 'content: "X"'}
+                                ],
+                            filter_action='native',
 
-                                        style_cell={
-                                                    'overflow': 'hidden',
-                                                    'textOverflow': 'ellipsis',
-                                                    'maxWidth': 0,
-                                                },
-                                                tooltip_data=[
-                                                    {
-                                                        column: {'value': str(value), 'type': 'markdown'}
-                                                        for column, value in row.items()
-                                                    } for row in df_papers[table_cols].to_dict('rows')
-                                                ],
-                                        tooltip_duration=None,
+                            style_cell={
+                                        'overflow': 'hidden',
+                                        'textOverflow': 'ellipsis',
+                                        'maxWidth': 0,
+                                    },
+                                    tooltip_data=[
+                                        {
+                                            column: {'value': str(value), 'type': 'markdown'}
+                                            for column, value in row.items()
+                                        } for row in df_papers[TABLE_COLS].to_dict('rows')
+                                    ],
+                            tooltip_duration=None,
 
-                                        style_cell_conditional=[
-                                            {
-                                                'if': {'column_id': c},
-                                                'textAlign': 'left'
-                                            } for c in ['Date', 'Region']
-                                        ],
-                                        style_data_conditional=[
-                                            {
-                                                'if': {'row_index': 'odd'},
-                                                'backgroundColor': 'rgb(248, 248, 248)'
-                                            }
-                                        ],
-                                        style_header={
-                                            'backgroundColor': 'rgb(230, 230, 230)',
-                                            'fontWeight': 'bold'
-                                        }
-                                    )
-                ]
-
-def getDropDownTopics(classes_topics_descr,class_sub_class):
-    return [
-                {'label': classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name'], \
-                 'value': classes_topics_descr[class_sub_class]['topic_'+str(topic_num)]['name']} for topic_num in range(len(classes_topics_descr[class_sub_class]))
+                            style_cell_conditional=[
+                                {
+                                    'if': {'column_id': col},
+                                    'textAlign': 'left'
+                                } for col in ['Date', 'Region']
+                            ],
+                            style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': 'rgb(248, 248, 248)'
+                                }
+                            ],
+                            style_header={
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                                'fontWeight': 'bold'
+                            }
+                        )
             ]
+
+# ----------------------------------------------------------------------------------------------------------------------
+def getDropDownTopics(classes_topics_descr, class_subclass):
+    return [
+            {'label': classes_topics_descr[class_subclass]['topic_'+str(topic_num)]['name'],
+             'value': classes_topics_descr[class_subclass]['topic_'+str(topic_num)]['name']} 
+            for topic_num in range(len(classes_topics_descr[class_subclass]))
+            ]
+
+
+

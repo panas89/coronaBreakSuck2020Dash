@@ -1,36 +1,31 @@
 import flask
 import dash
 import dash_bootstrap_components as dbc
-import plotly.graph_objs as gobs
+from dash.dependencies import Input, Output
+
 from components.core_components import *
 from components.components_utils import *
-# import sys
-# sys.path.append("..")
 from assets.input_data import *
 from callbacks.callbacks import *
-from dash.dependencies import Input, Output
-import dash_dangerously_set_inner_html
-import plotly
 
-
+# ######################################################################################################################
+# SERVER DEFINITION
+# ======================================================================================================================
 external_stylesheets = ['https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css']
-
-
 external_scripts = ['https://code.jquery.com/jquery-3.2.1.slim.min.js',
                     'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
                     'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js']
 
-# Server definition
-
 server = flask.Flask(__name__)
+
 app = dash.Dash(__name__,
                 external_stylesheets=external_stylesheets,
                 external_scripts=external_scripts,
                 server=server)
 
+# ======================================================================================================================
 # HEADER
-# ======
-
+# ======================================================================================================================
 header = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Page 1", href="#")),
@@ -51,123 +46,92 @@ header = dbc.NavbarSimple(
     dark=True
 )
 
-# Data
-# ==========
-
-# read data.
-
-
-
-# COMPONENTS
-# ==========
-
-# Your components go here.
-
-
-# INTERACTION
-# ===========
-
-# Your interaction goes here.
-
+# ======================================================================================================================
 # APP LAYOUT
-# ==========
+# ======================================================================================================================
 
 app.layout = html.Div([
                         header,
-                        class_loc,
-                        pb_time,
-                        class_grouped_topic,
-                        topic_dist,
-                        # proj_button,
-                        time_radio_buttons,
-                        topic_dist_vis,
-                        # topic_word_clouds,
-                        inc_death_rec_plots,
-                        # topic_vis,
-                        topic_dd,
-                        paper_table
+                        class_loc,  # 'class-subclass-drop-down', 'location-drop-down' 
+                        pub_time,  # 'pub-date-slider'
+                        topic_dist,  # 'topic-dist'
+                        time_radio_buttons,  # 'time-radio-buttons'
+                        topic_time_dist,  # 'topic-time-dist'
+                        inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
+                        topic_dd,  # 'topic-drop-down'
+                        paper_table  # 'table-papers'
                         ])
 
-
-# Callbacks
-# =========
-
-
+# ======================================================================================================================
+# CALLBACKS
+# ======================================================================================================================
 @app.callback(
     [Output('topic-time-dist', 'figure'),
-     Output('topic-dist', 'figure'),
-     Output('topic-vis', 'srcDoc'),
-     Output('classes-grouped-hist', 'children')],
-    [Input('class-sub-class-drop-down', 'value'),
+     Output('topic-dist', 'figure')],
+    [Input('class-subclass-drop-down', 'value'),
      Input('pub-date-slider', 'value'),
-     Input('time-rb', 'value')])
-def update_by_subclass(class_sub_class,times,time_resample_type):
+     Input('time-radio-buttons', 'value')])
+def update_by_subclass(class_subclass, dates, date_resample_type):
 
-    times = pd.to_datetime([str(df['publish_time'].min() \
-                        + datetime.timedelta(days=time_point))[:10] \
-                         for time_point in times])
+    dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
+                            for date in dates])
 
-    df_times = df.loc[df['publish_time'].between(times[0],times[1]),:].reset_index(drop=True)
+    df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
 
-    classes_topics_descr = getClassesDescriptionMap(df_times,time_resample_type)
+    classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
 
-    topics_descr = classes_topics_descr[class_sub_class]
+    topics_descr = classes_topics_descr[class_subclass]
 
-    fig_topic_time_dist = getTopicFig(class_sub_class,topics_descr)
+    fig_topic_time_dist = getTopicFig(class_subclass, topics_descr)
 
-    vis_obj = getVis(class_sub_class)
+    topics_dist = getTopicsHist(classes_topics_descr, class_subclass)
 
-    grouped_hist = getClassHist(classes_topics_descr,classes_sub_classes)#getGroupedHist(classes_topics_descr,classes_sub_classes)
+    return fig_topic_time_dist, topics_dist 
 
-    topics_dist = getTopicsHist(classes_topics_descr,class_sub_class)
-
-    return fig_topic_time_dist,topics_dist,vis_obj,grouped_hist
-
-
+# ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
     [Output('table-papers', 'children'),
      Output('topic-drop-down', 'options')],
-    [Input('class-sub-class-drop-down', 'value'),
+    [Input('class-subclass-drop-down', 'value'),
      Input('topic-drop-down', 'value'),
      Input('pub-date-slider', 'value'),
-     Input('time-rb', 'value')])
-def update_by_topic(class_sub_class,topics,times,time_resample_type):
+     Input('time-radio-buttons', 'value')])
+def update_by_topic(class_subclass,topics, dates, date_resample_type):
 
-    times = pd.to_datetime([str(df['publish_time'].min() \
-                        + datetime.timedelta(days=time_point))[:10] \
-                         for time_point in times])
+    dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10] 
+                            for date in dates])
 
-    df_times = df.loc[df['publish_time'].between(times[0],times[1]),:].reset_index(drop=True)
+    df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
 
-    classes_topics_descr = getClassesDescriptionMap(df_times,time_resample_type)
+    classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
 
-    children = getPapers(class_sub_class,topics,df_times)
+    children = getPapers(class_subclass, topics, df_dates)
 
-    options = getDropDownTopics(classes_topics_descr,class_sub_class)
+    options = getDropDownTopics(classes_topics_descr,class_subclass)
 
     values = [i['value'] for i in options]
 
-    return children,options
+    return children, options
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
     [Output('covid-cases', 'figure'),
      Output('covid-deaths', 'figure'),
      Output('covid-recoveries', 'figure')],
-    [Input('time-rb', 'value')])
-def update_by_deaths_inc_rec(time_resample_type):
+    [Input('time-radio-buttons', 'value')])
+def update_by_deaths_inc_rec(date_resample_type):
 
-    dates_inc , inc_data = preprocCases(df=df_inc,resample_type=time_resample_type)
-    dates_death , death_data = preprocCases(df=df_death,resample_type=time_resample_type)
-    dates_rec , rec_data = preprocCases(df=df_rec,resample_type=time_resample_type)
+    dates_inc , inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
+    dates_death , death_data = preprocCases(df=df_death, resample_type=date_resample_type)
+    dates_rec , rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
     
-
-    rec_fig = getRecoveriesFig(dates_rec,rec_data)
-    inc_fig = getIncFig(dates_inc,inc_data)
-    death_fig = getDeathFig(dates_death,death_data)
+    rec_fig = getRecoveriesFig(dates_rec, rec_data)
+    inc_fig = getIncFig(dates_inc, inc_data)
+    death_fig = getDeathFig(dates_death, death_data)
 
     return rec_fig,inc_fig,death_fig
 
 
+# ######################################################################################################################
 if __name__ == '__main__':
     app.run_server(debug=True)#, host='0.0.0.0')
