@@ -134,11 +134,6 @@ def getDeathFig(dates_death, death_data) -> dict:
             )
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 def getTopicsBarChart(classes_topics_descr, class_subclass):
     """Method to plot bar chart of topics"""
     x_axis_vals = [classes_topics_descr[class_subclass]['topic_' + str(num)]['name'] 
@@ -149,7 +144,7 @@ def getTopicsBarChart(classes_topics_descr, class_subclass):
     fig = go.Figure(data=go.Bar(
                                 x=x_axis_vals,
                                 y=y_axis_vals,
-                                marker_color =  COLORS[0]
+                                marker_color =  BAR_COLORS[0]
                             ),
                     layout=go.Layout(
                                     title=go.layout.Title(text= class_subclass.replace('_topic','').replace('_',' ').capitalize() + " - Topic distribution"),
@@ -160,5 +155,12 @@ def getTopicsBarChart(classes_topics_descr, class_subclass):
                     )
 
     return fig
+    
+# ----------------------------------------------------------------------------------------------------------------------
+def getTopic2Kws(df, class_subclass):
+    topic_col = f'{class_subclass}'
+    topic_kw_col = f'{class_subclass}_kw'
+    topic_kws_pairs = sorted(df.set_index([topic_col, topic_kw_col]).index.unique()) 
 
-
+    return dict((topic_num + 1, kws.split(', ')) for topic_num, kws in topic_kws_pairs if topic_num != -1)
+    
