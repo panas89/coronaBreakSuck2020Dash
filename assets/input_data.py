@@ -61,8 +61,7 @@ TIME_COLORS = ['#000000',
 def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
 
     # Load data
-    df = pd.read_csv(file_path, parse_dates=[
-                     'publish_time'], usecols=COLS_TO_READ)
+    df = pd.read_csv(file_path, parse_dates=[ 'publish_time'], usecols=cols_to_read)
 
     # Create DOI col
     # df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
