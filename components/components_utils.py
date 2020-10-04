@@ -19,7 +19,7 @@ def resamplePubTimes(df, resample_type) -> (list, list):
 
 # ----------------------------------------------------------------------------------------------------------------------
 def getClassesDescriptionMap(df, resample_type) -> dict:
-
+    """Cr"""
     classes_topics_descr = defaultdict(dict)
     for class_subclass in CLASSES_SUBCLASSES:
         for topic in df[class_subclass].unique():
@@ -47,91 +47,16 @@ def preprocCases(df, resample_type) -> (list, list):
     date_cols = [col for col in df.columns if col not in non_date_cols]
     dates = pd.to_datetime(date_cols)
     data = pd.Series([0] + list(df[date_cols].sum(axis=0))).diff()[1:] #difference per day in cases
-    
+
     # Resample cases
     temp_df = pd.DataFrame(data=data.to_list(), index=dates.to_list())
     temp_df.fillna(0,inplace=True)
     temp_df = temp_df.resample(resample_type, label='right', closed='right').sum()
-
+    
     dates = [date.strftime('%m-%d-%Y') for date in temp_df.index]
     data = list(temp_df.values.reshape(1,-1)[0])
 
     return dates, data
-
-# ----------------------------------------------------------------------------------------------------------------------
-def getRecoveriesFig(dates_rec, rec_data) -> dict:
-    """Method to get recoveries timeseries"""
-    return dict(
-                data=[
-                    dict(
-                        x=dates_rec,
-                        y=rec_data,
-                        name='Recoveries',
-                        marker=dict(
-                            color='rgb(55, 83, 109)'
-                        )
-                    ),
-                ],
-                layout=dict(
-                    title='New Covid recoveries',
-                    showlegend=True,
-                    legend=dict(
-                        x=0,
-                        y=1.0
-                    ),
-                    margin=dict(l=40, r=0, t=40, b=30)
-                )
-            )
-
-# ----------------------------------------------------------------------------------------------------------------------
-def getIncFig(dates_inc, inc_data) -> dict:
-    """Method to get incident timeseries"""
-    return dict(
-                data=[
-                    dict(
-                        x=dates_inc,
-                        y=inc_data,
-                        name='Positive cases',
-                        marker=dict(
-                            color='rgb(55, 83, 109)'
-                        )
-                    ),
-                ],
-                layout=dict(
-                    title='New Covid cases',
-                    showlegend=True,
-                    legend=dict(
-                        x=0,
-                        y=1.0
-                    ),
-                    margin=dict(l=40, r=0, t=40, b=30)
-                )
-            )
-
-# ----------------------------------------------------------------------------------------------------------------------
-def getDeathFig(dates_death, death_data) -> dict:
-    """Method to get incident timeseries"""
-    return dict(
-                data=[
-                    dict(
-                        x=dates_death,
-                        y=death_data,
-                        name='Deaths',
-                        marker=dict(
-                            color='rgb(55, 83, 109)'
-                        )
-                    ),
-                ],
-                layout=dict(
-                    title='New Covid deaths',
-                    showlegend=True,
-                    legend=dict(
-                        x=0,
-                        y=1.0
-                    ),
-                    margin=dict(l=40, r=0, t=40, b=30)
-                )
-            )
 
 # ----------------------------------------------------------------------------------------------------------------------
 def getTopicsBarChart(classes_topics_descr, class_subclass):

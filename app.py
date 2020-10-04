@@ -130,13 +130,14 @@ def update_by_topic(class_subclass, topics, start_date, end_date, date_resample_
     [Input('time-radio-buttons', 'value')])
 def update_by_deaths_inc_rec(date_resample_type):
 
+    # date_resample_type = 'mva'
     dates_inc , inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
     dates_death , death_data = preprocCases(df=df_death, resample_type=date_resample_type)
     dates_rec , rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
     
-    rec_fig = getRecoveriesFig(dates_rec, rec_data)
-    inc_fig = getIncFig(dates_inc, inc_data)
-    death_fig = getDeathFig(dates_death, death_data)
+    rec_fig = createCovidIncidentsFig(dates_rec, rec_data, 'Recoveries') 
+    inc_fig = createCovidIncidentsFig(dates_inc, inc_data, 'Cases')
+    death_fig = createCovidIncidentsFig(dates_death, death_data, 'Deaths')
 
     return rec_fig,inc_fig,death_fig
 

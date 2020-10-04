@@ -1,6 +1,7 @@
 from assets.input_data import *
 from components.core_components import *
 from components.components_utils import *
+from datetime import datetime as dt
 
 # ######################################################################################################################
 
@@ -10,7 +11,7 @@ def getTopicFig(class_subclass, topics_descr):
     return dict(
         data=[
             dict(
-                x=topics_descr['topic_'+str(topic_num)]['times'],
+                x=[dt.strptime(date, '%m-%d-%Y') for date in topics_descr['topic_'+str(topic_num)]['times']],
                 y=topics_descr['topic_'+str(topic_num)]['counts'],
                 name=topics_descr['topic_'+str(topic_num)]['name']
             ) for topic_num in range(len(topics_descr))
@@ -20,6 +21,7 @@ def getTopicFig(class_subclass, topics_descr):
                 class_subclass) + ' - Topic time distribution',
             showlegend=True,
             yaxis={'tickformat': ',d'},
+            xaxis_tickformat = '%d %B (%a)<br>%Y',
             legend=dict(
                 x=0,
                 y=1.0
@@ -44,7 +46,8 @@ def getPapers(class_subclass, topics, df):
 
     # Format table entries
     df.publish_time = df.publish_time.dt.strftime('%Y-%m-%d')
-    df.affiliations_country = df.affiliations_country.apply(lambda x: ', '.join(x.split(',')) if x is not np.nan else x)
+    df.affiliations_country = df.affiliations_country.apply(
+        lambda x: ', '.join(x.split(',')) if x is not np.nan else x)
     df_papers = df.loc[df[class_subclass].isin(
         list_of_topics_ind), TABLE_COLS].reset_index(drop=True)
 
@@ -62,12 +65,18 @@ def getPapers(class_subclass, topics, df):
         export_format='xlsx',
         export_headers='display',
         editable=True,
-        css=[
-            {"selector": ".column-header--delete svg",
-             "rule": 'display: "none"'},
-            {"selector": ".column-header--delete::before",
-             "rule": 'content: "X"'}
-        ],
+        css=[{"selector": "button",
+              "rule": f"""outline: none; 
+                      border: none; 
+                      background: {TABLE_ROW_COLOR}; 
+                      font-size: 16px"""},
+            {"selector": ".dash-spreadsheet-menu-item", 
+            "rule": "padding-right: 10px; padding-bottom: 10px; outline: none"},
+             {"selector": ".column-header--delete svg",
+              "rule": 'display: "none"'},
+             {"selector": ".column-header--delete::before",
+              "rule": 'content: "X"'}
+             ],
         filter_action='native',
         # style_data={'border': '0px'},
         style_cell={
@@ -126,7 +135,7 @@ def getTopicKwsTable_v2(df, class_subclass):
 
     return fig
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 def getTopicKwsTable(df, class_subclass):
 
     topic2kws = getTopic2Kws(df, class_subclass)
@@ -165,3 +174,28 @@ def getTopicKwsTable(df, class_subclass):
     )
 
     return table
+
+# ----------------------------------------------------------------------------------------------------------------------
+def createCovidIncidentsFig(dates, data, incident_name) -> dict:
+    """Method to get covid incidents timeseries"""
+    return dict(
+                data=[
+                    dict(
+                        x=[dt.strptime(date, '%m-%d-%Y') for date in dates],
+                        y=data,
+                        name=incident_name,
+                        marker=dict(
+                            color='rgb(55, 83, 109)'
+                        )
+                    ),
+                ],
+                layout=dict(
+                    title=f'New Covid {incident_name}',
+                    showlegend=True,
+                    legend=dict(
+                        x=0,
+                        y=1.0
+                    ),
+                    margin=dict(l=40, r=0, t=40, b=30)
+                )
+            )
