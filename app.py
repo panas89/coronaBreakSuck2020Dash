@@ -1,14 +1,14 @@
-import flask
-import dash
 from datetime import datetime as dt
-
-import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-
 from components.core_components import *
 from components.components_utils import *
 from assets.input_data import *
 from callbacks.callbacks import *
+
+import dash_bootstrap_components as dbc
+import flask
+import dash
+import ast
 
 # ######################################################################################################################
 # SERVER DEFINITION
@@ -60,8 +60,11 @@ app.layout = html.Div([
                         time_radio_buttons,  # 'time-radio-buttons'
                         topic_time_dist,  # 'topic-time-dist'
                         inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
+                        topic_table_heading,
                         topic_dd,  # 'topic-drop-down'
-                        paper_table  # 'table-papers'
+                        paper_table,  # 'table-papers',
+                        relation_table_heading,
+                        relation_table #relation table
                         ])
 
 # ======================================================================================================================
@@ -96,7 +99,27 @@ def update_by_subclass(class_subclass, start_date, end_date, date_resample_type)
 
     return fig_topic_time_dist, topics_bar, topic_kws_table
 
-# ----------------------------------------------------------------------------------------------------------------------
+# #----------------------------------------------------------------------------------------------------------------------
+@app.callback(
+    [Output('covid-cases', 'figure'),
+     Output('covid-deaths', 'figure'),
+     Output('covid-recoveries', 'figure')],
+    [Input('time-radio-buttons', 'value')])
+def update_by_deaths_inc_rec(date_resample_type):
+
+    # date_resample_type = 'mva'
+    dates_inc , inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
+    dates_death , death_data = preprocCases(df=df_death, resample_type=date_resample_type)
+    dates_rec , rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
+    
+    rec_fig = createCovidIncidentsFig(dates_rec, rec_data, 'Recoveries') 
+    inc_fig = createCovidIncidentsFig(dates_inc, inc_data, 'Cases')
+    death_fig = createCovidIncidentsFig(dates_death, death_data, 'Deaths')
+
+    return rec_fig,inc_fig,death_fig
+
+
+#-----------------------------------------------Callback for the topic table-------------------------------------------
 @app.callback(
     [Output('table-papers', 'children'),
      Output('topic-drop-down', 'options')],
@@ -122,24 +145,26 @@ def update_by_topic(class_subclass, topics, start_date, end_date, date_resample_
 
     return children, options
 
-# ----------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------Callback for the topic table-------------------------------------------
 @app.callback(
-    [Output('covid-cases', 'figure'),
-     Output('covid-deaths', 'figure'),
-     Output('covid-recoveries', 'figure')],
-    [Input('time-radio-buttons', 'value')])
-def update_by_deaths_inc_rec(date_resample_type):
+    [Output('relation-table', 'children'),],
+    [Input('pub-start-date', 'date'),
+     Input('pub-end-date', 'date'),])
+def update_by_relation(start_date, end_date):
+    """
+    This callback function handles the rendering logic of the corronavirus and entity relationships.
+    """
+    # get the df particular for certain dates
+    df_dates = df_relations.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
-    # date_resample_type = 'mva'
-    dates_inc , inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
-    dates_death , death_data = preprocCases(df=df_death, resample_type=date_resample_type)
-    dates_rec , rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
+    # Get the Dash data table
+    df_relation_f = df_dates.loc[:, RELATION_TABLE_COLS] 
     
-    rec_fig = createCovidIncidentsFig(dates_rec, rec_data, 'Recoveries') 
-    inc_fig = createCovidIncidentsFig(dates_inc, inc_data, 'Cases')
-    death_fig = createCovidIncidentsFig(dates_death, death_data, 'Deaths')
+    # assign
+    children = getRelations(df_relation_f)
 
-    return rec_fig,inc_fig,death_fig
+    return children
 
 # ######################################################################################################################
 if __name__ == '__main__':

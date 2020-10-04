@@ -3,6 +3,8 @@ from components.core_components import *
 from components.components_utils import *
 from datetime import datetime as dt
 
+import ast
+
 # ######################################################################################################################
 
 
@@ -113,6 +115,95 @@ def getPapers(class_subclass, topics, df):
         }
     )
     ]
+
+def getRelations(df_relation_f):
+    """
+    This function returns the Dash element (table) about the entity relations with coronavirus. 
+    
+    :param df_relation_f (dataframe: stores the entity relationships with coronavirus.  
+    """
+    # Clean up the relation columns
+    rs = []
+    for x in df_relation_f['relations'].tolist():
+        if isinstance(x, str):
+            rx = ast.literal_eval(x)
+
+            # create content string
+            ss = []
+            for c in rx:
+                s = "%s('%s', %.3f)"%(c[1],c[2][0],c[2][1])
+                ss.append(s)
+            rx = ", ".join(ss)
+        else:
+            rx = None
+        rs.append(rx)
+    df_relation_f['relations'] = rs
+    
+    # Create the Dash table object
+    table = [dash_table.DataTable(
+        data=df_relation_f.to_dict('records'),
+        columns=[{'id': col,
+                  'name': ' '.join(col.split('_')).title(),
+                  'clearable': True,
+                  'renamable': True,
+                  'hideable': True,
+                  'deletable': True}
+                 for col in RELATION_TABLE_COLS
+                 ],
+        page_size=20,
+        export_format='xlsx',
+        export_headers='display',
+        editable=True,
+        css=[{"selector": "button",
+              "rule": f"""outline: none; 
+                      border: none; 
+                      background: {TABLE_ROW_COLOR}; 
+                      font-size: 16px"""},
+            {"selector": ".dash-spreadsheet-menu-item", 
+            "rule": "padding-right: 10px; padding-bottom: 10px; outline: none"},
+             {"selector": ".column-header--delete svg",
+              "rule": 'display: "none"'},
+             {"selector": ".column-header--delete::before",
+              "rule": 'content: "X"'}
+             ],
+        filter_action='native',
+        # style_data={'border': '0px'},
+        style_cell={
+            'overflow': 'hidden',
+            'font_family': TABLE_FONT_FAMILY,
+            'font-size': TABLE_FONT_SIZE,
+            'textOverflow': 'ellipsis',
+            'maxWidth': 0,
+        },
+        tooltip_data=[
+            {
+                column: {'value': str(
+                    value), 'type': 'markdown'}
+                for column, value in row.items()
+            } for row in df_relation_f[RELATION_TABLE_COLS].to_dict('rows')
+        ],
+        tooltip_duration=None,
+
+        style_cell_conditional=[
+            {
+                'if': {'column_id': col},
+                'textAlign': 'left'
+            } for col in ['Date', 'Region']
+        ],
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'even'},
+                'backgroundColor': TABLE_ROW_COLOR
+            }
+        ],
+        style_header={
+            'backgroundColor': TABLE_HEADER_COLOR,
+            'fontWeight': 'bold'
+        }
+    )
+    ]
+    
+    return table
 
 # ----------------------------------------------------------------------------------------------------------------------
 
