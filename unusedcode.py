@@ -102,6 +102,7 @@ def wordCloudFigure(topic_descr):
 # ######################################################################################################################
 # Core Components
 # ######################################################################################################################
+import datetime
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
@@ -156,6 +157,22 @@ class_grouped_topic = html.Div(
                                         'padding': '25px 50px 50px 50px',
                                         'display': 'inline-block'}
                                 )
+# ----------------------------------------------------------------------------------------------------------------------
+pub_time = html.Div([
+                    html.Label('Publication date'),
+                    dcc.RangeSlider(
+                        id='pub-date-slider',
+                        min=0,
+                        max=TIME_DIFF,
+                        value=[0, TIME_DIFF],
+                        marks={time_point:
+                            dict(label=str(df['publish_time'].min() + datetime.timedelta(days=time_point))[:10],
+                                    style={"transform": "rotate(45deg)"})
+                            for time_point in range(0, TIME_DIFF+11, 11)},
+                    ),
+                ], style={'width': '100%',
+                        'padding': '25px 50px 50px 50px',
+                        'display': 'inline-block'})
 
 # ######################################################################################################################
 # Callbacks

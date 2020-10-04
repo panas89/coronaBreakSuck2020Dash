@@ -1,5 +1,7 @@
 import flask
 import dash
+from datetime import datetime as dt
+
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
@@ -40,9 +42,9 @@ header = dbc.NavbarSimple(
             label="More",
         ),
     ],
-    brand="coronaBreakSuck2020Dash",
+    brand="Trending Topics in Covid-19 Publications",
     brand_href="#",
-    color="primary",
+    color='#5EAAF5',#"primary",
     dark=True
 )
 
@@ -52,9 +54,9 @@ header = dbc.NavbarSimple(
 
 app.layout = html.Div([
                         header,
-                        class_loc,  # 'class-subclass-drop-down', 'location-drop-down' 
-                        pub_time,  # 'pub-date-slider'
-                        topic_dist,  # 'topic-dist'
+                        class_loc_date,  # 'class-subclass-drop-down', 'location-drop-down', 'pub-start/end-date'
+                        topics_bar,  # 'topics-bar'
+                        topic_kws_table,  # 'topic_kws_table'
                         time_radio_buttons,  # 'time-radio-buttons'
                         topic_time_dist,  # 'topic-time-dist'
                         inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
@@ -67,16 +69,20 @@ app.layout = html.Div([
 # ======================================================================================================================
 @app.callback(
     [Output('topic-time-dist', 'figure'),
-     Output('topic-dist', 'figure')],
+     Output('topics-bar', 'figure'),
+     Output('topic-kws-table', 'children')],
     [Input('class-subclass-drop-down', 'value'),
-     Input('pub-date-slider', 'value'),
+     Input('pub-start-date', 'date'),
+     Input('pub-end-date', 'date'),
      Input('time-radio-buttons', 'value')])
-def update_by_subclass(class_subclass, dates, date_resample_type):
+def update_by_subclass(class_subclass, start_date, end_date, date_resample_type):
 
-    dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
-                            for date in dates])
+    # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
+    #                         for date in dates])
 
-    df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
+    # df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
+
+    df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
     classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
 
@@ -84,9 +90,11 @@ def update_by_subclass(class_subclass, dates, date_resample_type):
 
     fig_topic_time_dist = getTopicFig(class_subclass, topics_descr)
 
-    topics_dist = getTopicsHist(classes_topics_descr, class_subclass)
+    topics_bar = getTopicsHist(classes_topics_descr, class_subclass)
 
-    return fig_topic_time_dist, topics_dist 
+    topic_kws_table = getTopicKwsTable(df, class_subclass)
+
+    return fig_topic_time_dist, topics_bar, topic_kws_table
 
 # ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
@@ -94,14 +102,15 @@ def update_by_subclass(class_subclass, dates, date_resample_type):
      Output('topic-drop-down', 'options')],
     [Input('class-subclass-drop-down', 'value'),
      Input('topic-drop-down', 'value'),
-     Input('pub-date-slider', 'value'),
+     Input('pub-start-date', 'date'),
+     Input('pub-end-date', 'date'),
      Input('time-radio-buttons', 'value')])
-def update_by_topic(class_subclass,topics, dates, date_resample_type):
+def update_by_topic(class_subclass, topics, start_date, end_date, date_resample_type):
 
-    dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10] 
-                            for date in dates])
+    # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10] 
+    #                         for date in dates])
 
-    df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
+    df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
     classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
 
@@ -121,16 +130,16 @@ def update_by_topic(class_subclass,topics, dates, date_resample_type):
     [Input('time-radio-buttons', 'value')])
 def update_by_deaths_inc_rec(date_resample_type):
 
+    # date_resample_type = 'mva'
     dates_inc , inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
     dates_death , death_data = preprocCases(df=df_death, resample_type=date_resample_type)
     dates_rec , rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
     
-    rec_fig = getRecoveriesFig(dates_rec, rec_data)
-    inc_fig = getIncFig(dates_inc, inc_data)
-    death_fig = getDeathFig(dates_death, death_data)
+    rec_fig = createCovidIncidentsFig(dates_rec, rec_data, 'Recoveries') 
+    inc_fig = createCovidIncidentsFig(dates_inc, inc_data, 'Cases')
+    death_fig = createCovidIncidentsFig(dates_death, death_data, 'Deaths')
 
     return rec_fig,inc_fig,death_fig
-
 
 # ######################################################################################################################
 if __name__ == '__main__':
