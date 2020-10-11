@@ -165,6 +165,18 @@ inc_death_rec_plots = html.Div(
            'display': 'inline-block'})
 
 # ----------------------------------------------------------------------------------------------------------------------
+topic_table_heading = html.Div([
+    html.H1('Topic Modeling'),
+    html.P('This table shows the topics identified in each research publication. You can filter the table by selecting a specific topic.'),],
+    style={'width': '100%',
+           #'height': '1000px',
+           'padding': '5px 50px',
+           'text-align': 'center',
+           'display': 'inline-block',
+          'font-size': TABLE_FONT_SIZE}
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
 topic_dd = html.Div([
     html.Label('Selected Topic(s)'),
     dcc.Dropdown(
@@ -173,14 +185,35 @@ topic_dd = html.Div([
         multi=True
     )
 ], style={'width': '25%',
-          'padding': '25px 50px 25px 50px',
+          'padding': '5px 50px 25px 50px',
           'display': 'inline-block'})
 
 # ----------------------------------------------------------------------------------------------------------------------
 paper_table = html.Div(
     id='table-papers',
     style={'width': '100%',
-           'height': '1000px',
-           'padding': '25px 50px 50px 50px',
+           #'height': '1000px',
+           'padding': '25px 50px 100px 50px',
+           'text-align': 'center',
+           'display': 'inline-block'})
+
+# ----------------------------------------------------------------------------------------------------------------------
+relation_table_heading = html.Div([
+    html.H1('Entity Relationships'),
+    html.P('This table shows the relationships (the relationship type & strength between 0.0 and 1.0) of the coronvavirus and different entities obtained by the research papers. The entity relations are extrarcted using the Opennre package (http://opennre.thunlp.ai/#/sent_re).'),],
+    style={'width': '100%',
+           #'height': '1000px',
+           'padding': '5px 50px',
+           'text-align': 'center',
+           'display': 'inline-block',
+          'font-size': TABLE_FONT_SIZE},
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
+relation_table = html.Div(
+    id='relation-table',
+    style={'width': '100%',
+           #'height': '1000px',
+           'padding': '5px 50px 100px 50px',
            'text-align': 'center',
            'display': 'inline-block'})

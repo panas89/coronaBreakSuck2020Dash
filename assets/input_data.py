@@ -41,8 +41,8 @@ BAR_COLORS = ['#4285F4']
 
 TABLE_HEADER_COLOR = '#9BCAF7'
 TABLE_ROW_COLOR = '#E6EFF9'
-TABLE_FONT_FAMILY = 'Sans-serif'
-TABLE_FONT_SIZE = '12px'
+TABLE_FONT_FAMILY = 'Arial' #'Sans-serif'
+TABLE_FONT_SIZE = '18px'
 
 TIME_COLORS = ['#000000',
 '#5D43D2',
@@ -84,7 +84,14 @@ df_inc = pd.read_csv(INCIDENTS_PATH, parse_dates=True)
 df_death = pd.read_csv(DEATHS_PATH, parse_dates=True)
 df_rec = pd.read_csv(RECOVERED_PATH, parse_dates=True)
 
-
 # Global Definitions
 LOCATIONS_COUNTRIES = df_inc['Country/Region'].unique()
 TIME_DIFF = (df['publish_time'].max()-df['publish_time'].min()).days
+
+# ################################################################################################## Relation table data
+RELATION_PATH = './data/relations/classified_merged_covid_relation.csv'
+RELATION_TABLE_COLS = ['title','publish_time','relations']
+
+# load relation data
+df_relations = pd.read_csv(RELATION_PATH)
+
