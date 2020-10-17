@@ -7,9 +7,10 @@ import dash_bootstrap_components as dbc
 
 
 from .components_utils import *
-from assets.input_data import *
+from assets.styling import *
 
 # ######################################################################################################################
+
 class_subclass_dd = html.Div([
     html.Label('Medical Category'),
     dcc.Dropdown(
@@ -19,7 +20,7 @@ class_subclass_dd = html.Div([
         value='risk_factor_topic'
     )
 ], style={'width': '25%',
-'verticalAlign': 'middle',
+          'verticalAlign': 'middle',
           'padding': '25px 50px 25px 50px',
           'display': 'inline-block'})
 

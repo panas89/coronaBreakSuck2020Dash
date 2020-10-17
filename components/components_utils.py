@@ -1,6 +1,8 @@
 import plotly.graph_objs as go
 from assets.input_data import *
 from collections import defaultdict
+from assets.styling import *
+
 
 # ######################################################################################################################
 def format_class_subclass(x) -> str: 
