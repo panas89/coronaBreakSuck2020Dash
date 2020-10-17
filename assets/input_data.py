@@ -37,24 +37,6 @@ CLASSES_SUBCLASSES = [
 MAX_DATE = pd.to_datetime("today")
 MAX_WEEK = MAX_DATE.isocalendar()[1]
 
-BAR_COLORS = ['#4285F4']
-
-TABLE_HEADER_COLOR = '#9BCAF7'
-TABLE_ROW_COLOR = '#E6EFF9'
-TABLE_FONT_FAMILY = 'Arial' #'Sans-serif'
-TABLE_FONT_SIZE = '18px'
-
-TIME_COLORS = ['#000000',
-'#5D43D2',
-'#4380D2',
-'#43B8D2',
-'#43D2A2',
-'#D2CE43',
-'#D9AC32',
-'#E76115',
-'#F03412'
-]
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 

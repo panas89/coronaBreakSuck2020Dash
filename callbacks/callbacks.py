@@ -2,7 +2,7 @@ from assets.input_data import *
 from components.core_components import *
 from components.components_utils import *
 from datetime import datetime as dt
-
+from assets.styling import *
 import ast
 
 # ######################################################################################################################
@@ -63,31 +63,6 @@ def getPapers(class_subclass, topics, df):
                   'deletable': True}
                  for col in TABLE_COLS
                  ],
-        page_size=20,
-        export_format='xlsx',
-        export_headers='display',
-        editable=True,
-        css=[{"selector": "button",
-              "rule": f"""outline: none; 
-                      border: none; 
-                      background: {TABLE_ROW_COLOR}; 
-                      font-size: 16px"""},
-            {"selector": ".dash-spreadsheet-menu-item", 
-            "rule": "padding-right: 10px; padding-bottom: 10px; outline: none"},
-             {"selector": ".column-header--delete svg",
-              "rule": 'display: "none"'},
-             {"selector": ".column-header--delete::before",
-              "rule": 'content: "X"'}
-             ],
-        filter_action='native',
-        # style_data={'border': '0px'},
-        style_cell={
-            'overflow': 'hidden',
-            'font_family': TABLE_FONT_FAMILY,
-            'font-size': TABLE_FONT_SIZE,
-            'textOverflow': 'ellipsis',
-            'maxWidth': 0,
-        },
         tooltip_data=[
             {
                 column: {'value': str(
@@ -95,24 +70,13 @@ def getPapers(class_subclass, topics, df):
                 for column, value in row.items()
             } for row in df_papers[TABLE_COLS].to_dict('rows')
         ],
-        tooltip_duration=None,
-
         style_cell_conditional=[
             {
                 'if': {'column_id': col},
                 'textAlign': 'left'
             } for col in ['Date', 'Region']
         ],
-        style_data_conditional=[
-            {
-                'if': {'row_index': 'even'},
-                'backgroundColor': TABLE_ROW_COLOR
-            }
-        ],
-        style_header={
-            'backgroundColor': TABLE_HEADER_COLOR,
-            'fontWeight': 'bold'
-        }
+        **STYLE_TABLE
     )
     ]
 
@@ -150,31 +114,6 @@ def getRelations(df_relation_f):
                   'deletable': True}
                  for col in RELATION_TABLE_COLS
                  ],
-        page_size=20,
-        export_format='xlsx',
-        export_headers='display',
-        editable=True,
-        css=[{"selector": "button",
-              "rule": f"""outline: none; 
-                      border: none; 
-                      background: {TABLE_ROW_COLOR}; 
-                      font-size: 16px"""},
-            {"selector": ".dash-spreadsheet-menu-item", 
-            "rule": "padding-right: 10px; padding-bottom: 10px; outline: none"},
-             {"selector": ".column-header--delete svg",
-              "rule": 'display: "none"'},
-             {"selector": ".column-header--delete::before",
-              "rule": 'content: "X"'}
-             ],
-        filter_action='native',
-        # style_data={'border': '0px'},
-        style_cell={
-            'overflow': 'hidden',
-            'font_family': TABLE_FONT_FAMILY,
-            'font-size': TABLE_FONT_SIZE,
-            'textOverflow': 'ellipsis',
-            'maxWidth': 0,
-        },
         tooltip_data=[
             {
                 column: {'value': str(
@@ -182,24 +121,7 @@ def getRelations(df_relation_f):
                 for column, value in row.items()
             } for row in df_relation_f[RELATION_TABLE_COLS].to_dict('rows')
         ],
-        tooltip_duration=None,
-
-        style_cell_conditional=[
-            {
-                'if': {'column_id': col},
-                'textAlign': 'left'
-            } for col in ['Date', 'Region']
-        ],
-        style_data_conditional=[
-            {
-                'if': {'row_index': 'even'},
-                'backgroundColor': TABLE_ROW_COLOR
-            }
-        ],
-        style_header={
-            'backgroundColor': TABLE_HEADER_COLOR,
-            'fontWeight': 'bold'
-        }
+        **STYLE_TABLE
     )
     ]
     
@@ -259,8 +181,8 @@ def getTopicKwsTable(df, class_subclass):
             }
         ],
         style_header={
-            'backgroundColor': TABLE_HEADER_COLOR,
-            'fontWeight': 'bold',
+            'backgroundColor': TABLE_HEADER_BACKGROUND_COLOR,
+            'color': TABLE_HEADER_COLOR,
         }
     )
 
