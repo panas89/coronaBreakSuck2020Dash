@@ -6,7 +6,7 @@ import os
 from assets.styling import *
 
 from app import app
-from apps import topicmodeling, about, homepage
+from apps import topicmodeling, about, homepage, rextractor
 
 # ######################################################################################################################
 # HEADER
@@ -17,7 +17,7 @@ header = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Home", href=os.path.join(BASE_URL, 'apps', 'homepage'))),
         dbc.NavItem(dbc.NavLink("Topic Modeling", href=os.path.join(BASE_URL, 'apps', 'topicmodeling'))),
-        dbc.NavItem(dbc.NavLink("NRE", href="#")),
+        dbc.NavItem(dbc.NavLink("NRE", href=os.path.join(BASE_URL, 'apps', 'rextractor'))),
         dbc.NavItem(dbc.NavLink("About Us", href=os.path.join(BASE_URL, 'apps', 'about'))),
     ],
     brand="NLP For Covid-19 Publications",
@@ -45,6 +45,8 @@ def display_page(pathname):
         return topicmodeling.layout
     elif pathname == '/apps/about':
         return about.layout
+    elif pathname == '/apps/rextractor':
+        return rextractor.layout
     else:
         return homepage.layout
 
