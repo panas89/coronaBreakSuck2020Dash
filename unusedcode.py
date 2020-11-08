@@ -158,6 +158,7 @@ class_grouped_topic = html.Div(
                                         'display': 'inline-block'}
                                 )
 # ----------------------------------------------------------------------------------------------------------------------
+# TIME_DIFF = (df['publish_time'].max()-df['publish_time'].min()).days
 pub_time = html.Div([
                     html.Label('Publication date'),
                     dcc.RangeSlider(

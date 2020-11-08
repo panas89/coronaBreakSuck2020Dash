@@ -1,4 +1,4 @@
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from components.core_components import *
 from components.components_utils import *
 from assets.input_data import *
@@ -40,6 +40,7 @@ from app import app
 
 layout = html.Div([
                         # header,
+                        dataset,
                         class_loc_date,  # 'class-subclass-drop-down', 'location-drop-down', 'pub-start/end-date'
                         topics_bar,  # 'topics-bar'
                         topic_kws_table,  # 'topic_kws_table'
@@ -57,19 +58,33 @@ layout = html.Div([
 # CALLBACKS
 # ======================================================================================================================
 @app.callback(
+    [Output('dataset-title', 'children')],
+    [Input('dataset-drop-down', 'value')])
+def sel_dataset_title(dataset_name):
+    
+    if not dataset_name:
+        return [None] 
+
+    return [dataset_name.upper()]
+
+#----------------------------------------------------------------------------------------------------------------------
+@app.callback(
     [Output('topic-time-dist', 'figure'),
      Output('topics-bar', 'figure'),
      Output('topic-kws-table', 'children')],
-    [Input('class-subclass-drop-down', 'value'),
+    [Input('dataset-drop-down', 'value'),
+     Input('class-subclass-drop-down', 'value'),
      Input('pub-start-date', 'date'),
      Input('pub-end-date', 'date'),
      Input('time-radio-buttons', 'value')])
-def update_by_subclass(class_subclass, start_date, end_date, date_resample_type):
+def update_by_subclass(dataset_name, class_subclass, start_date, end_date, date_resample_type):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
     #                         for date in dates])
 
     # df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
+
+    df = dataset2df[dataset_name]
 
     df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
@@ -85,7 +100,7 @@ def update_by_subclass(class_subclass, start_date, end_date, date_resample_type)
 
     return fig_topic_time_dist, topics_bar, topic_kws_table
 
-# #----------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback(
     [Output('covid-cases', 'figure'),
      Output('covid-deaths', 'figure'),
@@ -109,15 +124,18 @@ def update_by_deaths_inc_rec(date_resample_type):
 @app.callback(
     [Output('table-papers', 'children'),
      Output('topic-drop-down', 'options')],
-    [Input('class-subclass-drop-down', 'value'),
+    [Input('dataset-drop-down', 'value'),
+     Input('class-subclass-drop-down', 'value'),
      Input('topic-drop-down', 'value'),
      Input('pub-start-date', 'date'),
      Input('pub-end-date', 'date'),
      Input('time-radio-buttons', 'value')])
-def update_by_topic(class_subclass, topics, start_date, end_date, date_resample_type):
+def update_by_topic(dataset_name, class_subclass, topics, start_date, end_date, date_resample_type):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10] 
     #                         for date in dates])
+
+    df = dataset2df[dataset_name]
 
     df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 

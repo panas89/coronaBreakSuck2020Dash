@@ -5,19 +5,54 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
-
 from .components_utils import *
 from assets.styling import *
+from assets.input_data import DATASET_NAMES
+
 
 # ######################################################################################################################
+dataset_dd = html.Div(
+    [
+        html.Label('Select Dataset (hover over name for description)'),
+        dcc.Dropdown(
+            id='dataset-drop-down',
+            options=[dict(label=name, value=name, title='TODO: add information about dataset') for name in DATASET_NAMES],
+            placeholder='Select Dataset',
+            value=DATASET_NAMES[0],
+            persistence=True,
+            persistence_type='local',
+            clearable=False
+        )
+    ], 
+    style={
+        'width': '50%',
+        'verticalAlign': 'middle',
+        'padding': '25px 50px 25px 50px',
+        'display': 'inline-block'
+    }
+)
 
+dataset_title = html.H1(
+    id='dataset-title',
+    style={
+        'text-align': 'center',
+        'verticalAlign': 'middle',
+        'padding': '25px 50px 25px 50px'
+    }
+)
+dataset = html.Div([dataset_dd, dataset_title])
+
+# ----------------------------------------------------------------------------------------------------------------------
 class_subclass_dd = html.Div([
     html.Label('Medical Category'),
     dcc.Dropdown(
         id='class-subclass-drop-down',
         options=[dict(label=format_class_subclass(c_s), value=c_s)
                  for c_s in CLASSES_SUBCLASSES],
-        value='risk_factor_topic'
+        value='risk_factor_topic',
+        persistence=True,
+        persistence_type='local',
+        clearable=False
     )
 ], style={'width': '25%',
           'verticalAlign': 'middle',
@@ -29,8 +64,10 @@ location_dd = html.Div([
     dcc.Dropdown(
         id='location-drop-down',
         options=[dict(label=country, value=country)
-                 for country in LOCATIONS_COUNTRIES],
-        value='MTL'
+                 for country in LOCATIONS_COUNTRIES if isinstance(country, str) ],
+        value='MTL',
+        persistence=True,
+        persistence_type='local'
     )
 ], style={'width': '25%',
 'verticalAlign': 'middle',
@@ -44,7 +81,9 @@ pub_start_date = html.Div([
         min_date_allowed=dt(2020, 1, 1),
         max_date_allowed=MAX_DATE,
         initial_visible_month=dt(2020, 1, 1),
-        date=str(dt(2020, 1, 1))
+        date=str(dt(2020, 1, 1)),
+        persistence=True,
+        persistence_type='local'
     ),
 ],
     style={'width': '25%',
@@ -59,7 +98,9 @@ pub_end_date = html.Div([
                             min_date_allowed=dt(2020, 1, 1),
                             max_date_allowed=MAX_DATE,
                             initial_visible_month=MAX_DATE,
-                            date=str(MAX_DATE)
+                            date=str(MAX_DATE),
+                            persistence=True,
+                            persistence_type='local'
                         ),
                         ],
                         style={'width': '25%',
@@ -110,6 +151,8 @@ time_radio_buttons = html.Div([
         value='W',
         labelStyle={'padding': '10px 50px 0px 50px',
                     'display': 'inline-block'},
+        persistence=True,
+        persistence_type='local'
     )
 ],
     style={'width': '100%',
@@ -183,7 +226,9 @@ topic_dd = html.Div([
     dcc.Dropdown(
         id='topic-drop-down',
         value=['Topic 1'],
-        multi=True
+        multi=True,
+        persistence=True,
+        persistence_type='local'
     )
 ], style={'width': '25%',
           'padding': '5px 50px 25px 50px',

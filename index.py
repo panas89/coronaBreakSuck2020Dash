@@ -6,7 +6,7 @@ import os
 from assets.styling import *
 
 from app import app
-from apps import topicmodeling, about, homepage, rextractor
+from apps import topicmodeling, about, homepage#, rextractor
 
 # ######################################################################################################################
 # HEADER
@@ -45,8 +45,8 @@ def display_page(pathname):
         return topicmodeling.layout
     elif pathname == '/apps/about':
         return about.layout
-    elif pathname == '/apps/rextractor':
-        return rextractor.layout
+    # elif pathname == '/apps/rextractor':
+    #     return rextractor.layout
     else:
         return homepage.layout
 

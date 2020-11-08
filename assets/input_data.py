@@ -1,11 +1,13 @@
+import os
 import pandas as pd
 import numpy as np
 
 # ######################################################################################################################
-TOPIC_MODELING_PATH = './data/topicmodels/pcf_topic_data.csv'
-INCIDENTS_PATH = './data/conf_global.csv'
-DEATHS_PATH = './data/death_global.csv'
-RECOVERED_PATH = './data/recovered_global.csv'
+TOPIC_DIR = './data/topicmodels/'
+
+INCIDENTS_PATH = './data/forecasting_covid/conf_global.csv'
+DEATHS_PATH = './data/forecasting_covid/death_global.csv'
+RECOVERED_PATH = './data/forecasting_covid/recovered_global.csv'
 
 COLS_TO_READ = ['sha', 'title', 'abstract', 'publish_time', 'affiliations_country',  # 'doi',
                 'location_country', 'risk_factor_topic', 'risk_factor_topic_kw',
@@ -38,8 +40,6 @@ MAX_DATE = pd.to_datetime("today")
 MAX_WEEK = MAX_DATE.isocalendar()[1]
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
 def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
 
     # Load data
@@ -58,19 +58,36 @@ def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
 
 # ######################################################################################################################
 
+# Load Dataset Data
+dataset2df = {}
+for path in os.listdir(TOPIC_DIR):
+    # create file_path
+    full_path = os.path.join(TOPIC_DIR, path)
 
-# Load Data
-df = load_topic_modeling_data(
-    file_path=TOPIC_MODELING_PATH, cols_to_read=COLS_TO_READ, max_date=MAX_DATE)
+    # create dataset name
+    raw_name = path.split('.')[0]  # remove .csv
+    name = " ".join(raw_name.split('_')).title()
+    print(full_path)
+    # load dataset and store to dict
+    try:
+        dataset2df[name] = load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
+        print('GOOD', full_path)
+    except:
+        print('BAD', full_path)
+
+DATASET_NAMES = list(dataset2df.keys())
+
+
+
 df_inc = pd.read_csv(INCIDENTS_PATH, parse_dates=True)
 df_death = pd.read_csv(DEATHS_PATH, parse_dates=True)
 df_rec = pd.read_csv(RECOVERED_PATH, parse_dates=True)
 
 # Global Definitions
 LOCATIONS_COUNTRIES = df_inc['Country/Region'].unique()
-TIME_DIFF = (df['publish_time'].max()-df['publish_time'].min()).days
 
-# ################################################################################################## Relation table data
+# ################################################################################################## 
+# Relation table data
 RELATION_PATH = './data/relations/classified_merged_covid_relation.csv'
 RELATION_TABLE_COLS = ['title','publish_time','relations']
 
