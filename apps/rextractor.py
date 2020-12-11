@@ -11,6 +11,8 @@ from assets.input_data import *
 from app import app
 
 # ######################################################################################################################
+df = dataset2df[DATASET_NAMES[0]]
+
 corpus_text = ''
 for abstract in df.loc[:2,'abstract'].values:
     corpus_text += abstract
@@ -21,7 +23,7 @@ rextractor = RelationExtractor("assets/Davids_interest_meshed.yaml")
 # ======================================================================================================================
 # APP LAYOUT
 # ======================================================================================================================
-app.layout = html.Div(
+layout = html.Div(
     [
         dcc.Input(id="input-1", type="text", value='electroconvulsive', debounce=True),
         dcc.Input(id="input-2", type="text", value='COVID-19', debounce=True),

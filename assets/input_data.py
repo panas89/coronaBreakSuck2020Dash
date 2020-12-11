@@ -67,13 +67,12 @@ for path in os.listdir(TOPIC_DIR):
     # create dataset name
     raw_name = path.split('.')[0]  # remove .csv
     name = " ".join(raw_name.split('_')).title()
-    print(full_path)
     # load dataset and store to dict
     try:
         dataset2df[name] = load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
         print('GOOD', full_path)
-    except:
-        print('BAD', full_path)
+    except Exception as e:
+        print('BAD', full_path, '\n', e)
 
 DATASET_NAMES = list(dataset2df.keys())
 
