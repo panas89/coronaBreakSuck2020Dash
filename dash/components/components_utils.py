@@ -71,7 +71,7 @@ def getTopicsBarChart(classes_topics_descr, class_subclass):
     fig = go.Figure(data=go.Bar(
                                 x=x_axis_vals,
                                 y=y_axis_vals,
-                                marker_color =  BAR_COLORS[0]
+                                marker_color = BAR_COLORS[0]
                             ),
                     layout=go.Layout(
                                     title=go.layout.Title(text= class_subclass.replace('_topic','').replace('_',' ').capitalize() + " - Topic distribution"),

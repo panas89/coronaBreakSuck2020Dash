@@ -39,20 +39,20 @@ from app import app
 # ======================================================================================================================
 
 layout = html.Div([
-                        # header,
-                        dataset,
-                        class_loc_date,  # 'class-subclass-drop-down', 'location-drop-down', 'pub-start/end-date'
-                        topics_bar,  # 'topics-bar'
-                        topic_kws_table,  # 'topic_kws_table'
-                        time_radio_buttons,  # 'time-radio-buttons'
-                        topic_time_dist,  # 'topic-time-dist'
-                        inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
-                        topic_table_heading,
-                        topic_dd,  # 'topic-drop-down'
-                        paper_table,  # 'table-papers',
-                        relation_table_heading,
-                        relation_table #relation table
-                        ])
+    # header,
+    dataset,
+    class_loc_date,  # 'class-subclass-drop-down', 'location-drop-down', 'pub-start/end-date'
+    topics_bar,  # 'topics-bar'
+    topic_kws_table,  # 'topic_kws_table'
+    time_radio_buttons,  # 'time-radio-buttons'
+    topic_time_dist,  # 'topic-time-dist'
+    inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
+    topic_table_heading,
+    topic_dd,  # 'topic-drop-down'
+    paper_table,  # 'table-papers',
+    relation_table_heading,
+    relation_table #relation table
+    ])
 
 # ======================================================================================================================
 # CALLBACKS

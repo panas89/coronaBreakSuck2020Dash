@@ -7,10 +7,11 @@ import dash_bootstrap_components as dbc
 
 from .components_utils import *
 from assets.styling import *
-from assets.input_data import DATASET_NAMES
+from assets.input_data import DATASET_NAMES, nre_dataset_name2path
 
-
-# ######################################################################################################################
+# ======================================================================================================================
+# TOPIC MODELING
+# ======================================================================================================================
 dataset_dd = html.Div(
     [
         html.Label('Select Dataset (hover over name for description)'),
@@ -21,7 +22,8 @@ dataset_dd = html.Div(
             value=DATASET_NAMES[0],
             persistence=True,
             persistence_type='local',
-            clearable=False
+            clearable=False,
+            multi=False
         )
     ], 
     style={
@@ -263,3 +265,106 @@ relation_table = html.Div(
            'padding': '5px 50px 100px 50px',
            'text-align': 'center',
            'display': 'inline-block'})
+
+# ======================================================================================================================
+# NRE
+# ======================================================================================================================
+nre_dataset_dd = html.Div(
+    [
+        html.Label('Select Dataset (hover over name for description)'),
+        dcc.Dropdown(
+            id="nre-dataset-dd",
+            options=[
+                dict(
+                    label=name, 
+                    value=path, 
+                    title='TODO: add information about dataset'
+                ) 
+                for name, path in nre_dataset_name2path.items()
+            ],
+            placeholder='Select Dataset',
+            value=list(nre_dataset_name2path.values())[0],
+            persistence=True,
+            persistence_type='local',
+            clearable=False,
+            multi=False
+        )
+    ], 
+    style={
+        'width': '50%',
+        'verticalAlign': 'middle',
+        'padding': '25px 50px 25px 50px',
+        'display': 'inline-block'
+    }
+)
+
+nre_dataset_title = html.H1(
+    id='nre-dataset-title-v2',
+    style={
+        'text-align': 'center',
+        'verticalAlign': 'middle',
+        'padding': '25px 50px 25px 50px'
+    }
+)
+
+nre_dataset = html.Div([nre_dataset_dd, nre_dataset_title])
+
+# ----------------------------------------------------------------------------------------------------------------------
+nre_class_subclass_dd = dcc.Dropdown(
+    options=[
+        dict(label=class_sub, value=class_sub)
+        for class_sub in list(class_subclass2kws.keys())
+    ],
+    value=[list(class_subclass2kws.keys())[0]],
+    multi=True,
+    id="nre-class-subclass-dd",
+    style={
+        'width': '25%',
+        'padding': '5px 50px 25px 50px',
+        'display': 'inline-block'
+    }
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
+nre_kw_dd = dcc.Dropdown(
+    options=[
+        dict(label=kw, value=kw)
+        for kw in class_subclass2kws[list(class_subclass2kws.keys())[0]]
+    ],
+    value=[class_subclass2kws[list(class_subclass2kws.keys())[0]][0]],
+    multi=True,
+    id="nre_kw_dd",
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
+nre_prob_scat_plot = dcc.Graph(
+    id="nre-prob-scat-plot",
+    style={
+            'width': '100%',
+            'height': '100%',
+            'padding': '0px 50px 25px 50px',
+            'display': 'inline-block'
+        }
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
+nre_kws_plot = dcc.Graph(
+    id="nre-kws-plot",
+    style={
+            'width': '100%',
+            'height': '100%',
+            'padding': '0px 50px 25px 50px',
+            'display': 'inline-block'
+        }
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
+nre_mult_kws_plot = dcc.Graph(
+    id="nre-mult-kws-plot",
+    style={
+            'width': '100%',
+            'height': '100%',
+            'padding': '0px 50px 25px 50px',
+            'display': 'inline-block'
+        }
+)

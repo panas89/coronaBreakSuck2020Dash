@@ -18,7 +18,7 @@ for abstract in df.loc[:2,'abstract'].values:
     corpus_text += abstract
 
 # initiate the extractor
-rextractor = RelationExtractor("assets/Davids_interest_meshed.yaml")
+# rextractor = RelationExtractor("assets/Davids_interest_meshed.yaml")
 
 # ======================================================================================================================
 # APP LAYOUT
@@ -39,7 +39,7 @@ layout = html.Div(
     [Input("input-1", "value"), Input("input-2", "value")],
 )
 def update_output(input1, input2):
-    relation = rextractor.extract(corpus_text, input1, input2)
+    relation = None #rextractor.extract(corpus_text, input1, input2)
     if relation == None:
         return u'{} and {} have no association'.format(input1, input2)
     else:

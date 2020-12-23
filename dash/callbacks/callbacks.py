@@ -1,13 +1,21 @@
+# Misc
+import ast
+from datetime import datetime as dt
+
+# Relative imports
 from assets.input_data import *
+from assets.styling import *
 from components.core_components import *
 from components.components_utils import *
-from datetime import datetime as dt
-from assets.styling import *
-import ast
+from components import vis as rvis
 
-# ######################################################################################################################
+# Plotly
+import plotly.express as px
+import plotly.graph_objects as go
 
-
+# ======================================================================================================================
+# TOPIC MODELING
+# ======================================================================================================================
 def getTopicFig(class_subclass, topics_descr):
 
     return dict(
@@ -34,15 +42,11 @@ def getTopicFig(class_subclass, topics_descr):
     )
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
 def getTopicsHist(classes_topics_descr, class_subclass):
 
     return getTopicsBarChart(classes_topics_descr, class_subclass)
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
 def getPapers(class_subclass, topics, df):
     list_of_topics_ind = [int(topic[-1])-1 for topic in topics]
 
@@ -79,7 +83,7 @@ def getPapers(class_subclass, topics, df):
         **STYLE_TABLE
     )
     ]
-
+# ----------------------------------------------------------------------------------------------------------------------
 def getRelations(df_relation_f):
     """
     This function returns the Dash element (table) about the entity relations with coronavirus. 
@@ -128,8 +132,6 @@ def getRelations(df_relation_f):
     return table
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
 def getDropDownTopics(classes_topics_descr, class_subclass):
     return [
         {'label': classes_topics_descr[class_subclass]['topic_'+str(topic_num)]['name'],
@@ -138,8 +140,6 @@ def getDropDownTopics(classes_topics_descr, class_subclass):
     ]
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
 def getTopicKwsTable_v2(df, class_subclass):
     topic2kws = getTopic2Kws(df, class_subclass)
     fig = go.Figure(data=[go.Table(header=dict(values=[f'Topic {topic_num}' for topic_num in topic2kws.keys()]),
@@ -212,3 +212,76 @@ def createCovidIncidentsFig(dates, data, incident_name) -> dict:
                     margin=dict(l=40, r=0, t=40, b=30)
                 )
             )
+
+# ======================================================================================================================
+# RELATION EXTRACTION
+# ======================================================================================================================
+def getPubScatter(df, x, y, hover_name):
+    """Method to get publication scatter plot."""
+
+    fig = px.scatter(df, x=x, y=y, hover_name=hover_name)
+    fig.update_layout(
+        title="Strength of discovered relationship along paper publication month",
+        xaxis_title="Publish Time",
+        yaxis_title="Probability",
+        font=dict(
+            # family="Courier New, monospace",
+            size=18,
+        ),
+        
+    )
+    
+    fig.update_traces(marker=dict(color=BAR_COLORS[0]))
+
+    return fig
+
+# ----------------------------------------------------------------------------------------------------------------------
+def getKW_RE_plot(df, kws):
+    """Method to get line plot of kw relationship over time."""
+
+    df_grps = rvis.preproces_for_kws_specific_plot(df, kws=kws)
+
+    fig = go.Figure(
+        data=go.Scatter(
+            x=df_grps["publish_month"],
+            y=df_grps["proba_mean"],
+            error_y=dict(
+                type="data",  # value of error bar given in data coordinates
+                array=df_grps["proba_stderr"],
+                visible=True,
+            ),
+            marker_color=BAR_COLORS[0]
+        )
+    )
+    fig.update_layout(
+        yaxis=dict(range=[0, 1]),
+        title="coronavirus - keyword(s) relationship over time",
+        xaxis_title="Month",
+        yaxis_title="Strength",
+        font=dict(
+            size=18,
+        ),
+    )
+    return fig
+
+# ----------------------------------------------------------------------------------------------------------------------
+def getMult_KW_scatter_plot(df, kw_interest):
+    """Method to get multiple kwords scatter plot"""
+
+    df_new_p = rvis.preprocess_for_multiple_kw_visualization(
+        df, kw_interest=kw_interest
+    )
+
+    fig = px.scatter(
+        df_new_p, x="publish_time", y="probability", color="keyword", size="probability"
+    )
+    fig.update_layout(
+        yaxis=dict(range=[0, 1.1]),
+        title="coronavirus - keyword relationship",
+        xaxis_title="Publish Time",
+        yaxis_title="Strength",
+        font=dict(
+            size=18,
+        ),
+    )
+    return fig
