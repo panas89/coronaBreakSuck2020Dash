@@ -60,6 +60,19 @@ for path in os.listdir(TOPIC_DIR):
     except Exception as e:
         print('BAD', full_path, '\n', e)
 
+# Create dataset name,file_path dict for Topic Modeling
+topic_dataset_name2path = {}
+for path in os.listdir(TOPIC_DIR):
+
+    # create file_path
+    full_path = os.path.join(TOPIC_DIR, path)
+
+    # create dataset name
+    raw_name = path.split('.')[0]  # remove .csv
+    name = " ".join(raw_name.split('_')).title()
+    
+    topic_dataset_name2path[name] = full_path
+
 # Load Forecasting Data
 df_inc = pd.read_csv(INCIDENTS_PATH, parse_dates=True)
 df_death = pd.read_csv(DEATHS_PATH, parse_dates=True)
@@ -83,7 +96,7 @@ LOCATIONS_COUNTRIES = df_inc['Country/Region'].unique()
 nre_dataset_name2path = {}
 for path in os.listdir(NRE_DIR):
     # create file_path
-    full_path = os.path.join(TOPIC_DIR, path)
+    full_path = os.path.join(NRE_DIR, path)
 
     # create dataset name
     raw_name = path.split('.')[0]  # remove .csv
@@ -102,7 +115,7 @@ print(nre_dataset_name2path)
 
 
 # Create data dictionary from yaml  
-yaml_path = "assets/Davids_interest_meshed.yaml"
+yaml_path = os.path.join(DASH_DIR, "assets/Davids_interest_meshed.yaml")
 with open(yaml_path) as f:
     data_yml = yaml.load(f, Loader=yaml.FullLoader)
 

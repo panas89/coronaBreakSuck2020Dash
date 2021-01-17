@@ -4,8 +4,9 @@ import dash_html_components as html
 from assets.styling import *
 import base64
 import os
+from assets.input_data import DASH_DIR
 
-IMG_DIR = 'assets/images/'
+IMG_DIR = os.path.join(DASH_DIR, 'assets/images/')
 PAGE_STYLE = {'width': '100%',
               'padding': '50px 50px 50px 50px',
               'display': 'inline-block'}
@@ -59,9 +60,25 @@ In this context,
 
 ##### 2) Neural Relation Extraction (NRE):
 
-- yo
-- yo
+We utilize a Deep Learning open-source package, OpenNRE \[1\], to
+- extract semantic relationships between two entities of interest within the covid-19 literature
+- identify whether an entity of interest has a strong relationship with the word "coronavirus" (and/or its aliases)
 
+Implementation: 
+- We apply the package’s supervised sentence-level NRE model, which is a BERT model \[2\] trained using 56,000 sentences from WikiData \[3\]
+- This NRE model outputs 
+    1. the probability of two entities to be related
+    2. the type of relationship (e.g. “X is the father of Y”)
+- Among the 80+ possible relationship types, we consider only the two most meaningful ones, namely:
+    1. 
+    2. 
+- At last, we visualize ... 
+
+\[1\]	X. Han, T. Gao, Y. Yao, D. Ye, Z. Liu, and M. Sun, “OpenNRE: An open and extensible toolkit for neural relation extraction,” arXiv Prepr. arXiv1909.13078, 2019. 
+
+\[2\]	J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, “Bert: Pre-training of deep bidirectional transformers for language understanding,” arXiv Prepr. arXiv1810.04805, 2018. 
+
+\[3\]	D. Vrandečić and M. Krötzsch, “Wikidata: a free collaborative knowledgebase,” Commun. ACM, vol. 57, no. 10, pp. 78–85, 2014.
 """,
     style=PAGE_STYLE)
 

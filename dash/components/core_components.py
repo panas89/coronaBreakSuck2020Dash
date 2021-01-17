@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 
 from .components_utils import *
 from assets.styling import *
-from assets.input_data import DATASET_NAMES, nre_dataset_name2path
+from assets.input_data import topic_dataset_name2path, nre_dataset_name2path
 
 # ======================================================================================================================
 # TOPIC MODELING
@@ -17,9 +17,12 @@ dataset_dd = html.Div(
         html.Label('Select Dataset (hover over name for description)'),
         dcc.Dropdown(
             id='dataset-drop-down',
-            options=[dict(label=name, value=name, title='TODO: add information about dataset') for name in DATASET_NAMES],
+            options=[
+                dict(label=name, value=file_path, title='TODO: add information about dataset') 
+                for name, file_path in topic_dataset_name2path.items()
+            ],
             placeholder='Select Dataset',
-            value=DATASET_NAMES[0],
+            value=list(topic_dataset_name2path.values())[0],
             persistence=True,
             persistence_type='local',
             clearable=False,

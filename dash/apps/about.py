@@ -4,8 +4,9 @@ from app import app
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from assets.styling import *
+from assets.input_data import DASH_DIR
 
-IMG_DIR = 'assets/images/'
+IMG_DIR = os.path.join(DASH_DIR, 'assets/images/')
 
 # ######################################################################################################################
 # HELPER FUNCTIONS

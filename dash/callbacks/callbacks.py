@@ -16,6 +16,23 @@ import plotly.graph_objects as go
 # ======================================================================================================================
 # TOPIC MODELING
 # ======================================================================================================================
+def createTopicModelingDf(file_path, cols_to_read=COLS_TO_READ, max_date=MAX_DATE) -> pd.DataFrame:
+
+    # Load data
+    df = pd.read_csv(file_path, parse_dates=[ 'publish_time'], usecols=cols_to_read)
+
+    # Create DOI col
+    # df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
+
+    # Create date col
+    df['date'] = [date.strftime('%m-%d-%Y') for date in df['publish_time']]
+
+    # Fix unknown/wrong publication datetimes to today
+    df.loc[df['publish_time'] > max_date, 'publish_time'] = max_date
+
+    return df
+
+# ----------------------------------------------------------------------------------------------------------------------
 def getTopicFig(class_subclass, topics_descr):
 
     return dict(
@@ -230,7 +247,7 @@ def getPubScatter(df, x, y, hover_name):
         ),
         
     )
-    
+
     fig.update_traces(marker=dict(color=BAR_COLORS[0]))
 
     return fig
