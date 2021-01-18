@@ -132,7 +132,12 @@ topics_bar = html.Div([
           'padding': '25px 300px 25px 300px',
           'display': 'inline-block'})
 
-# ----------------------------------------------------------------------------------------------------------------------
+topics_bar = dcc.Loading(
+    id="loading-topics-bar",
+    children=[topics_bar],
+    type="circle"
+)
+# -----------------------------------------`-----------------------------------------------------------------------------
 topic_kws_table = html.Div(
     id='topic-kws-table',
     style={'width': '100%',
@@ -140,6 +145,11 @@ topic_kws_table = html.Div(
            'text-align': 'center',
            'display': 'inline-block'})
 
+topic_kws_table = dcc.Loading(
+    id="loading-topic-kws-table",
+    children=[topic_kws_table],
+    type="circle"
+)
 
 # ----------------------------------------------------------------------------------------------------------------------
 time_radio_buttons = html.Div([
@@ -177,6 +187,12 @@ topic_time_dist = html.Div([
           'padding': '0px 50px 25px 50px',
           'display': 'inline-block'})
 
+topic_time_dist = dcc.Loading(
+    id="loading-topic-time-dist",
+    children=[topic_time_dist],
+    type="circle"
+)
+
 # ----------------------------------------------------------------------------------------------------------------------
 incident_cases = html.Div([
     dcc.Graph(
@@ -213,10 +229,18 @@ inc_death_rec_plots = html.Div(
            'padding': '25px 50px 50px 50px',
            'display': 'inline-block'})
 
+inc_death_rec_plots = dcc.Loading(
+    id="loading-inc-death-rec-plots",
+    children=[inc_death_rec_plots],
+    type="circle"
+)
+
 # ----------------------------------------------------------------------------------------------------------------------
-topic_table_heading = html.Div([
-    html.H1('Topic Modeling'),
-    html.P('This table shows the topics identified in each research publication. You can filter the table by selecting a specific topic.'),],
+topic_table_heading = html.Div(
+    [
+        html.H1('PUBLICATIONS GROUPED BY TOPIC'),
+        # html.P('This table shows the topics identified in each research publication. You can filter the table by selecting a specific topic.'),
+    ],
     style={'width': '100%',
            #'height': '1000px',
            'padding': '5px 50px',
@@ -248,26 +272,31 @@ paper_table = html.Div(
            'text-align': 'center',
            'display': 'inline-block'})
 
-# ----------------------------------------------------------------------------------------------------------------------
-relation_table_heading = html.Div([
-    html.H1('Entity Relationships'),
-    html.P('This table shows the relationships (the relationship type & strength between 0.0 and 1.0) of the coronvavirus and different entities obtained by the research papers. The entity relations are extrarcted using the Opennre package (http://opennre.thunlp.ai/#/sent_re).'),],
-    style={'width': '100%',
-           #'height': '1000px',
-           'padding': '5px 50px',
-           'text-align': 'center',
-           'display': 'inline-block',
-          'font-size': TABLE_FONT_SIZE},
+paper_table = dcc.Loading(
+    id="loading-paper-table",
+    children=[paper_table],
+    type="circle"
 )
-
 # ----------------------------------------------------------------------------------------------------------------------
-relation_table = html.Div(
-    id='relation-table',
-    style={'width': '100%',
-           #'height': '1000px',
-           'padding': '5px 50px 100px 50px',
-           'text-align': 'center',
-           'display': 'inline-block'})
+# relation_table_heading = html.Div([
+#     html.H1('Entity Relationships'),
+#     html.P('This table shows the relationships (the relationship type & strength between 0.0 and 1.0) of the coronvavirus and different entities obtained by the research papers. The entity relations are extrarcted using the Opennre package (http://opennre.thunlp.ai/#/sent_re).'),],
+#     style={'width': '100%',
+#            #'height': '1000px',
+#            'padding': '5px 50px',
+#            'text-align': 'center',
+#            'display': 'inline-block',
+#           'font-size': TABLE_FONT_SIZE},
+# )
+
+# # ----------------------------------------------------------------------------------------------------------------------
+# relation_table = html.Div(
+#     id='relation-table',
+#     style={'width': '100%',
+#            #'height': '1000px',
+#            'padding': '5px 50px 100px 50px',
+#            'text-align': 'center',
+#            'display': 'inline-block'})
 
 # ======================================================================================================================
 # NRE

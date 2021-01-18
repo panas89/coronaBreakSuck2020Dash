@@ -74,7 +74,7 @@ def getTopicsBarChart(classes_topics_descr, class_subclass):
                                 marker_color = BAR_COLORS[0]
                             ),
                     layout=go.Layout(
-                                    title=go.layout.Title(text= class_subclass.replace('_topic','').replace('_',' ').capitalize() + " - Topic distribution"),
+                                    title=go.layout.Title(text= "TOPIC DISTRIBUTION" + f" ({format_class_subclass(class_subclass)})"),
                                     yaxis={'tickformat': ',d'},
                                     title_x=0.5,
                                     margin=dict(l=40, r=0, t=40, b=30)

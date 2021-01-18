@@ -44,8 +44,7 @@ def getTopicFig(class_subclass, topics_descr):
             ) for topic_num in range(len(topics_descr))
         ],
         layout=dict(
-            title=format_class_subclass(
-                class_subclass) + ' - Topic time distribution',
+            title="TOPIC TIME EVOLUTION" + f" ({format_class_subclass(class_subclass)})",
             showlegend=True,
             yaxis={'tickformat': ',d'},
             xaxis_tickformat = '%d %B (%a)<br>%Y',

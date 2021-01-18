@@ -49,9 +49,7 @@ layout = html.Div([
     inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
     topic_table_heading,
     topic_dd,  # 'topic-drop-down'
-    paper_table,  # 'table-papers',
-    relation_table_heading,
-    relation_table #relation table
+    paper_table,  # 'table-papers'
     ])
 
 # ======================================================================================================================
@@ -59,13 +57,13 @@ layout = html.Div([
 # ======================================================================================================================
 @app.callback(
     [Output('dataset-title', 'children')],
-    [Input('dataset-drop-down', 'value')])
-def sel_dataset_title(dataset_name):
+    [Input('dataset-drop-down', 'options'),
+     Input('dataset-drop-down', 'value')])
+def set_dataset_title(options, value_chosen):
     
-    if not dataset_name:
-        return [None] 
+    dataset_title = [x['label'] for x in options if x['value'] == value_chosen][0]
 
-    return [dataset_name.upper()]
+    return [dataset_title.upper()]
 
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback(
@@ -77,14 +75,14 @@ def sel_dataset_title(dataset_name):
      Input('pub-start-date', 'date'),
      Input('pub-end-date', 'date'),
      Input('time-radio-buttons', 'value')])
-def update_by_subclass(dataset_name, class_subclass, start_date, end_date, date_resample_type):
+def update_by_subclass(dataset_path, class_subclass, start_date, end_date, date_resample_type):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
     #                         for date in dates])
 
     # df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
 
-    df = dataset2df[dataset_name]
+    df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
 
     df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
@@ -119,7 +117,6 @@ def update_by_deaths_inc_rec(date_resample_type):
 
     return rec_fig,inc_fig,death_fig
 
-
 #-----------------------------------------------Callback for the topic table-------------------------------------------
 @app.callback(
     [Output('table-papers', 'children'),
@@ -130,12 +127,12 @@ def update_by_deaths_inc_rec(date_resample_type):
      Input('pub-start-date', 'date'),
      Input('pub-end-date', 'date'),
      Input('time-radio-buttons', 'value')])
-def update_by_topic(dataset_name, class_subclass, topics, start_date, end_date, date_resample_type):
+def update_by_topic(dataset_path, class_subclass, topics, start_date, end_date, date_resample_type):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10] 
     #                         for date in dates])
 
-    df = dataset2df[dataset_name]
+    df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
 
     df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
@@ -143,7 +140,7 @@ def update_by_topic(dataset_name, class_subclass, topics, start_date, end_date, 
 
     children = getPapers(class_subclass, topics, df_dates)
 
-    options = getDropDownTopics(classes_topics_descr,class_subclass)
+    options = getDropDownTopics(classes_topics_descr, class_subclass)
 
     values = [i['value'] for i in options]
 

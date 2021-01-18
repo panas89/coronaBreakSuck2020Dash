@@ -37,13 +37,13 @@ layout = html.Div(
 # ======================================================================================================================
 @app.callback(
     Output('nre-dataset-title-v2', 'children'),
-    [Input('nre-dataset-dd', 'value')])
-def set_nre_dataset_title(dataset_name):
+    [Input('nre-dataset-dd', 'options'),
+     Input('nre-dataset-dd', 'value')])
+def set_nre_dataset_title(options, value_chosen):
     
-    if not dataset_name:
-        return [None] 
+    dataset_title = [x['label'] for x in options if x['value'] == value_chosen][0]
 
-    return [dataset_name.upper()]
+    return [dataset_title.upper()]
 
 # ----------------------------------------------------------------------------------------------------------------------
 @app.callback(

@@ -46,6 +46,7 @@ def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
 # ######################################################################################################################
 # Load Topic Modeling Data
 dataset2df = {}
+topic_dataset_name2path = {}
 for path in os.listdir(TOPIC_DIR):
     # create file_path
     full_path = os.path.join(TOPIC_DIR, path)
@@ -55,23 +56,26 @@ for path in os.listdir(TOPIC_DIR):
     name = " ".join(raw_name.split('_')).title()
     # load dataset and store to dict
     try:
-        dataset2df[name] = load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
+        # dataset2df[name] = load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
+        load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
+        topic_dataset_name2path[name] = full_path
+
         print('GOOD', full_path)
     except Exception as e:
         print('BAD', full_path, '\n', e)
 
-# Create dataset name,file_path dict for Topic Modeling
-topic_dataset_name2path = {}
-for path in os.listdir(TOPIC_DIR):
+# # Create dataset name,file_path dict for Topic Modeling
+# topic_dataset_name2path = {}
+# for path in os.listdir(TOPIC_DIR):
 
-    # create file_path
-    full_path = os.path.join(TOPIC_DIR, path)
+#     # create file_path
+#     full_path = os.path.join(TOPIC_DIR, path)
 
-    # create dataset name
-    raw_name = path.split('.')[0]  # remove .csv
-    name = " ".join(raw_name.split('_')).title()
+#     # create dataset name
+#     raw_name = path.split('.')[0]  # remove .csv
+#     name = " ".join(raw_name.split('_')).title()
     
-    topic_dataset_name2path[name] = full_path
+#     topic_dataset_name2path[name] = full_path
 
 # Load Forecasting Data
 df_inc = pd.read_csv(INCIDENTS_PATH, parse_dates=True)
@@ -79,7 +83,7 @@ df_death = pd.read_csv(DEATHS_PATH, parse_dates=True)
 df_rec = pd.read_csv(RECOVERED_PATH, parse_dates=True)
 
 # Global Definitions
-DATASET_NAMES = list(dataset2df.keys())
+DATASET_NAMES = list(topic_dataset_name2path.keys())
 LOCATIONS_COUNTRIES = df_inc['Country/Region'].unique()
 
 # ################################################################################################## 
