@@ -11,7 +11,12 @@ from apps import topicmodeling, about, homepage, nre
 # ======================================================================================================================
 # HEADER
 # ======================================================================================================================
-BASE_URL = "http://127.0.0.1:8050/"
+port = int(os.environ.get("PORT", 5000))
+
+if port == 5000:
+    BASE_URL = "http://0.0.0.0:5000"
+else:
+    BASE_URL = "http://covidinsights.herokuapp.com"
 
 header = dbc.NavbarSimple(
     children=[
@@ -52,4 +57,4 @@ def display_page(pathname):
 
 # ######################################################################################################################
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False, host="0.0.0.0", port=port)

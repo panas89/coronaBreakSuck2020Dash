@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-# Download and Install OpenNRE
+# Download OpenNRE in app directory
+cd app
 echo 'Downloading openre package...'
 git clone https://github.com/thunlp/OpenNRE.git
+
+# Install OpenNRE
 cd OpenNRE
 echo 'Installing opennre package...'
 python3 setup.py install 

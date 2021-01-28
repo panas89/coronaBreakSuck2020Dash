@@ -149,6 +149,7 @@ def getRelations(df_relation_f):
 
 # ----------------------------------------------------------------------------------------------------------------------
 def getDropDownTopics(classes_topics_descr, class_subclass):
+    
     return [
         {'label': classes_topics_descr[class_subclass]['topic_'+str(topic_num)]['name'],
          'value': classes_topics_descr[class_subclass]['topic_'+str(topic_num)]['name']}
