@@ -16,6 +16,7 @@ dash-dangerously-set-inner-html==0.0.2
 dash-html-components==1.0.1
 dash-renderer==1.0.1
 dash-table==4.2.0
+dataclasses==0.7
 decorator==4.4.2
 filelock==3.0.12
 Flask==1.1.1
@@ -36,6 +37,7 @@ murmurhash==1.0.4
 nltk==3.4.5
 numexpr==2.7.1
 numpy==1.19.0
+-e git+https://github.com/thunlp/OpenNRE.git@c40c680f65df6b9f20080023cf41402232e42625#egg=opennre
 packaging==20.4
 pandas==1.0.5
 parso==0.7.0
