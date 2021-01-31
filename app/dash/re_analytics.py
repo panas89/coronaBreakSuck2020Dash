@@ -5,8 +5,10 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import yaml
 from components import vis as rvis
+import pandas as pd
+import numpy as np
 
-from assets.input_data import *
+# from assets.input_data import *
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -23,7 +25,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 import glob
 
-filenames = glob.glob("data/relationship_extraction/*.csv")
+filenames = glob.glob("app/dash/data/relationship_extraction/*.csv")
 meaningfull_filenames = [
     "Top 5-10\% High impact papers",
     "Semantic scholar COVID-19 papers",
@@ -33,7 +35,7 @@ meaningfull_filenames = [
 
 
 ############################# creating data structure from the yaml file (data dictionary)
-data_path = "assets/Davids_interest_meshed.yaml"
+data_path = "app/dash/assets/Davids_interest_meshed.yaml"
 with open(data_path) as f:
     data_yml = yaml.load(f, Loader=yaml.FullLoader)
 
@@ -45,6 +47,8 @@ classes.remove("disease_name")
 for c in classes:
     data_class_subclass[c] = data_yml[c]["%s_common_name" % c]["kw"]
 
+print(classes)
+
 #############################
 
 # =======================================================
@@ -55,11 +59,13 @@ for c in classes:
 def getPubScatter(df, x, y, hover_name):
     """Method to get publication scatter plot."""
 
-    fig = px.scatter(df, x=x, y=y, hover_name=hover_name)
+    fig = px.scatter(
+        df, x=x, y=y, hover_name=hover_name, color=y, color_discrete_map="Viridis"
+    )
     fig.update_layout(
-        title="Strength of discovered relationship along paper publication month",
-        xaxis_title="Publish Time",
-        yaxis_title="Probability",
+        title="Keyword to COVID-19 association",
+        xaxis_title="",
+        yaxis_title="Strength of association",
         font=dict(
             family="Courier New, monospace",
             size=18,
@@ -93,10 +99,10 @@ def getKW_RE_plot(df, kws):
         )
     )
     fig.update_layout(
-        yaxis=dict(range=[0, 1]),
-        title="coronavirus - keyword(s) relationship over time",
-        xaxis_title="Month",
-        yaxis_title="Strength",
+        yaxis=dict(range=[0, 1.1]),
+        title="Medical category to COVID-19 association",
+        xaxis_title="",
+        yaxis_title="Strength of association",
         font=dict(
             family="Courier New, monospace",
             size=18,
@@ -117,9 +123,9 @@ def getMult_KW_scatter_plot(df, kw_interest):
     )
     fig.update_layout(
         yaxis=dict(range=[0, 1.1]),
-        title="coronavirus - keyword relationship",
-        xaxis_title="Publish Time",
-        yaxis_title="Strength",
+        title="(Medical category,keyword) to COVID-19 association",
+        xaxis_title="",
+        yaxis_title="Strength of association",
         font=dict(
             family="Courier New, monospace",
             size=18,
@@ -133,12 +139,19 @@ def getMult_KW_scatter_plot(df, kw_interest):
 # ======================================================================================================================
 app.layout = html.Div(
     children=[
-        html.H1(children="Relationship Extraction analytics"),
+        html.H1(children="Relationship Extraction Analysis"),
         html.Div(
             children="""
-        Dash: A web application framework for Python.
+        In additional to topic modeling, we are also interested to investigate how certain keywords (e.g., kidney) are related to Coronavirus disease (Covid-19) based on the scientific discoveries from the literature. Relation extraction is a natural language processing (NLP) task that is to extract relations (e.g., “founder of”) between two entities. For example, pneumonia is highly related to Covid-19 because it is one of the infections that is caused by Covid-19. 
+
+In here, we utilized a relationship extraction package, OpenNRE [1], to identify the strength of relationship (i.e., “is related to”) between a keyword and Covid-19. The OpenNRE consisted of classification models that were trained with open-source annotated relationship datas using deep learning techniques. The strength of the relationship has a scale of 0 (no relation) to 1 (completely related). See Below for several “strength” plots that show the relationship of a keyword with Covid-19 along time.
+
+
+Reference:
+1. https://github.com/thunlp/OpenNRE
     """
         ),
+        html.H4(children="Select Dataset"),
         dcc.Dropdown(
             options=[
                 {"label": name, "value": filename}
@@ -153,6 +166,7 @@ app.layout = html.Div(
             # figure=getPubScatter(df_new, x='publish_time',
             #                         y='probability', hover_name='keyword')
         ),
+        html.H4(children="Medical Category"),
         dcc.Dropdown(
             options=[
                 {"label": class_sub, "value": class_sub}
@@ -162,6 +176,7 @@ app.layout = html.Div(
             multi=True,
             id="dd-class_sub_class",
         ),
+        html.H4(children="Keywords"),
         dcc.Dropdown(
             options=[
                 {"label": kw, "value": kw}
@@ -199,14 +214,23 @@ app.layout = html.Div(
 )
 def update_output(class_sub_classes, filename):
 
-    df = pd.read_csv(filename)
+    df_new = pd.read_csv(filename, date_parser=True)
+    df_new["publish_time"] = pd.to_datetime(df_new["publish_time"])
 
-    df_new = rvis.preprocess_df(df)
+    # df_new = rvis.preprocess_df(df)
 
     kws = []
 
     for class_sub in class_sub_classes:
-        kws.extend(data_class_subclass[class_sub])
+        kws.extend(
+            [
+                kw
+                for kw in data_class_subclass[class_sub]
+                if kw in df_new["keyword"].tolist()
+            ]
+        )
+
+    kws = list(np.unique(kws))
 
     kws_dict = [{"label": kw, "value": kw} for kw in kws]
 
@@ -214,7 +238,12 @@ def update_output(class_sub_classes, filename):
         kws_dict,
         kws,
         getMult_KW_scatter_plot(df_new, kw_interest=kws),
-        getPubScatter(df_new, x="publish_time", y="probability", hover_name="keyword"),
+        getPubScatter(
+            df_new.dropna(subset=["keyword"]),
+            x="publish_time",
+            y="probability",
+            hover_name="keyword",
+        ),
     )
 
 
@@ -227,9 +256,10 @@ def update_output(class_sub_classes, filename):
 )
 def update_output(kws, filename):
 
-    df = pd.read_csv(filename)
+    df_new = pd.read_csv(filename, date_parser=True)
+    df_new["publish_time"] = pd.to_datetime(df_new["publish_time"])
 
-    df_new = rvis.preprocess_df(df)
+    # df_new = rvis.preprocess_df(df)
 
     return getKW_RE_plot(df_new, kws=kws)
 
