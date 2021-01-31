@@ -69,10 +69,8 @@ Implementation:
 - This NRE model outputs 
     1. the probability of two entities to be related
     2. the type of relationship (e.g. “X is the father of Y”)
-- Among the 80+ possible relationship types, we consider only the two most meaningful ones, namely:
-    1. 
-    2. 
-- At last, we visualize ... 
+- Among the 80+ possible relationship types, we consider only the most relevant one to our work, namely: "is related to".
+- At last, we visualize the strength of relationship between select keywords and covid-19.
 
 \[1\]	X. Han, T. Gao, Y. Yao, D. Ye, Z. Liu, and M. Sun, “OpenNRE: An open and extensible toolkit for neural relation extraction,” arXiv Prepr. arXiv1909.13078, 2019. 
 
