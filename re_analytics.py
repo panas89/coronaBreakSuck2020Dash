@@ -45,6 +45,8 @@ classes.remove("disease_name")
 for c in classes:
     data_class_subclass[c] = data_yml[c]["%s_common_name" % c]["kw"]
 
+print(classes)
+
 #############################
 
 # =======================================================
@@ -199,14 +201,23 @@ app.layout = html.Div(
 )
 def update_output(class_sub_classes, filename):
 
-    df = pd.read_csv(filename)
+    df_new = pd.read_csv(filename, date_parser=True)
+    df_new["publish_time"] = pd.to_datetime(df_new["publish_time"])
 
-    df_new = rvis.preprocess_df(df)
+    # df_new = rvis.preprocess_df(df)
 
     kws = []
 
     for class_sub in class_sub_classes:
-        kws.extend(data_class_subclass[class_sub])
+        kws.extend(
+            [
+                kw
+                for kw in data_class_subclass[class_sub]
+                if kw in df_new["keyword"].tolist()
+            ]
+        )
+
+    kws = list(np.unique(kws))
 
     kws_dict = [{"label": kw, "value": kw} for kw in kws]
 
@@ -214,7 +225,12 @@ def update_output(class_sub_classes, filename):
         kws_dict,
         kws,
         getMult_KW_scatter_plot(df_new, kw_interest=kws),
-        getPubScatter(df_new, x="publish_time", y="probability", hover_name="keyword"),
+        getPubScatter(
+            df_new.dropna(subset=["keyword"]),
+            x="publish_time",
+            y="probability",
+            hover_name="keyword",
+        ),
     )
 
 
@@ -227,9 +243,10 @@ def update_output(class_sub_classes, filename):
 )
 def update_output(kws, filename):
 
-    df = pd.read_csv(filename)
+    df_new = pd.read_csv(filename, date_parser=True)
+    df_new["publish_time"] = pd.to_datetime(df_new["publish_time"])
 
-    df_new = rvis.preprocess_df(df)
+    # df_new = rvis.preprocess_df(df)
 
     return getKW_RE_plot(df_new, kws=kws)
 
