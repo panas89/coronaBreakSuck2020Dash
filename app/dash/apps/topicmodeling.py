@@ -38,44 +38,57 @@ from app import app
 # APP LAYOUT
 # ======================================================================================================================
 
-layout = html.Div([
-    # header,
-    dataset,
-    class_loc_date,  # 'class-subclass-drop-down', 'location-drop-down', 'pub-start/end-date'
-    topics_bar,  # 'topics-bar'
-    topic_kws_table,  # 'topic_kws_table'
-    time_radio_buttons,  # 'time-radio-buttons'
-    topic_time_dist,  # 'topic-time-dist'
-    inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
-    topic_table_heading,
-    topic_dd,  # 'topic-drop-down'
-    paper_table,  # 'table-papers'
-    ])
+layout = html.Div(
+    [
+        # header,
+        dataset,
+        class_loc_date,  # 'class-subclass-drop-down', 'location-drop-down', 'pub-start/end-date'
+        topics_bar,  # 'topics-bar'
+        topic_kws_table,  # 'topic_kws_table'
+        time_radio_buttons,  # 'time-radio-buttons'
+        topic_time_dist,  # 'topic-time-dist'
+        inc_death_rec_plots,  # 'covid-cases', 'covid-deaths', 'covid-recoveries'
+        topic_table_heading,
+        topic_dd,  # 'topic-drop-down'
+        paper_table,  # 'table-papers'
+    ]
+)
 
 # ======================================================================================================================
 # CALLBACKS
 # ======================================================================================================================
 @app.callback(
-    [Output('dataset-title', 'children')],
-    [Input('dataset-drop-down', 'options'),
-     Input('dataset-drop-down', 'value')])
+    [Output("dataset-title", "children")],
+    [
+        Input("dataset-drop-down", "options"),
+        Input("dataset-drop-down", "value"),
+    ],
+)
 def set_dataset_title(options, value_chosen):
-    
-    dataset_title = [x['label'] for x in options if x['value'] == value_chosen][0]
+
+    dataset_title = [x["label"] for x in options if x["value"] == value_chosen][0]
 
     return [dataset_title.upper()]
 
-#----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
-    [Output('topic-time-dist', 'figure'),
-     Output('topics-bar', 'figure'),
-     Output('topic-kws-table', 'children')],
-    [Input('dataset-drop-down', 'value'),
-     Input('class-subclass-drop-down', 'value'),
-     Input('pub-start-date', 'date'),
-     Input('pub-end-date', 'date'),
-     Input('time-radio-buttons', 'value')])
-def update_by_subclass(dataset_path, class_subclass, start_date, end_date, date_resample_type):
+    [
+        Output("topic-time-dist", "figure"),
+        Output("topics-bar", "figure"),
+        Output("topic-kws-table", "children"),
+    ],
+    [
+        Input("dataset-drop-down", "value"),
+        Input("class-subclass-drop-down", "value"),
+        Input("pub-start-date", "date"),
+        Input("pub-end-date", "date"),
+        Input("time-radio-buttons", "value"),
+    ],
+)
+def update_by_subclass(
+    dataset_path, class_subclass, start_date, end_date, date_resample_type
+):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
     #                         for date in dates])
@@ -84,7 +97,12 @@ def update_by_subclass(dataset_path, class_subclass, start_date, end_date, date_
 
     df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
 
-    df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
+    df_dates = df.loc[df["publish_time"].between(start_date, end_date), :].reset_index(
+        drop=True
+    )
+
+    # print(df_dates.head(10))
+    # print(df_dates["publish_time"].min())
 
     classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
 
@@ -98,56 +116,81 @@ def update_by_subclass(dataset_path, class_subclass, start_date, end_date, date_
 
     return fig_topic_time_dist, topics_bar, topic_kws_table
 
-#----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
-    [Output('covid-cases', 'figure'),
-     Output('covid-deaths', 'figure'),
-     Output('covid-recoveries', 'figure')],
-    [Input('time-radio-buttons', 'value')])
+    [
+        Output("covid-cases", "figure"),
+        Output("covid-deaths", "figure"),
+        Output("covid-recoveries", "figure"),
+    ],
+    [Input("time-radio-buttons", "value")],
+)
 def update_by_deaths_inc_rec(date_resample_type):
 
     # date_resample_type = 'mva'
-    dates_inc , inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
-    dates_death , death_data = preprocCases(df=df_death, resample_type=date_resample_type)
-    dates_rec , rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
-    
-    rec_fig = createCovidIncidentsFig(dates_rec, rec_data, 'Recoveries') 
-    inc_fig = createCovidIncidentsFig(dates_inc, inc_data, 'Cases')
-    death_fig = createCovidIncidentsFig(dates_death, death_data, 'Deaths')
+    dates_inc, inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
+    dates_death, death_data = preprocCases(
+        df=df_death, resample_type=date_resample_type
+    )
+    dates_rec, rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
 
-    return rec_fig,inc_fig,death_fig
+    rec_fig = createCovidIncidentsFig(dates_rec, rec_data, "Recoveries")
+    inc_fig = createCovidIncidentsFig(dates_inc, inc_data, "Cases")
+    death_fig = createCovidIncidentsFig(dates_death, death_data, "Deaths")
 
-#-----------------------------------------------Callback for the topic table-------------------------------------------
+    return rec_fig, inc_fig, death_fig
+
+
+# -----------------------------------------------Callback for the topic table-------------------------------------------
 @app.callback(
-    [Output('table-papers', 'children'),
-     Output('topic-drop-down', 'options')],
-    [Input('dataset-drop-down', 'value'),
-     Input('class-subclass-drop-down', 'value'),
-     Input('topic-drop-down', 'value'),
-     Input('pub-start-date', 'date'),
-     Input('pub-end-date', 'date'),
-     Input('time-radio-buttons', 'value')])
-def update_by_topic(dataset_path, class_subclass, topics, start_date, end_date, date_resample_type):
+    [
+        Output("table-papers", "children"),
+        Output("topic-drop-down", "options"),
+        Output("location-drop-down", "options"),
+    ],
+    [
+        Input("dataset-drop-down", "value"),
+        Input("class-subclass-drop-down", "value"),
+        Input("topic-drop-down", "value"),
+        Input("pub-start-date", "date"),
+        Input("pub-end-date", "date"),
+        Input("time-radio-buttons", "value"),
+    ],
+)
+def update_by_topic(
+    dataset_path, class_subclass, topics, start_date, end_date, date_resample_type
+):
 
-    # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10] 
+    # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
     #                         for date in dates])
 
     df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
 
-    df_dates = df.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
+    df_dates = df.loc[df["publish_time"].between(start_date, end_date), :].reset_index(
+        drop=True
+    )
 
     classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
 
     children = getPapers(class_subclass, topics, df_dates)
 
-    options = getDropDownTopics(classes_topics_descr, class_subclass)
+    # print(type(children))
 
-    values = [i['value'] for i in options]
+    options_topics = getDropDownTopics(classes_topics_descr, class_subclass)
 
-    return children, options
+    values = [i["value"] for i in options_topics]
+
+    options_location = getDropDownLocations(df_dates["location"].unique())
+
+    return (
+        children,
+        options_topics,
+        options_location,
+    )
 
 
-#-----------------------------------------------Callback for the topic table-------------------------------------------
+# -----------------------------------------------Callback for the topic table-------------------------------------------
 # @app.callback(
 #     [Output('relation-table', 'children'),],
 #     [Input('pub-start-date', 'date'),
@@ -160,8 +203,8 @@ def update_by_topic(dataset_path, class_subclass, topics, start_date, end_date, 
 #     df_dates = df_relations.loc[df['publish_time'].between(start_date, end_date),:].reset_index(drop=True)
 
 #     # Get the Dash data table
-#     df_relation_f = df_dates.loc[:, RELATION_TABLE_COLS] 
-    
+#     df_relation_f = df_dates.loc[:, RELATION_TABLE_COLS]
+
 #     # assign
 #     children = getRelations(df_relation_f)
 
