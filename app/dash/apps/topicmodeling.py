@@ -172,16 +172,35 @@ def update_by_subclass(
         Output("covid-deaths", "figure"),
         Output("covid-recoveries", "figure"),
     ],
-    [Input("time-radio-buttons", "value")],
+    [
+        Input("time-radio-buttons", "value"),
+        Input("location-drop-down", "value"),
+    ],
 )
-def update_by_deaths_inc_rec(date_resample_type):
+def update_by_deaths_inc_rec(date_resample_type, location):
+
+    # filter by location
+    if location != "Worldwide":
+        df_inc_loc = df_inc.loc[
+            df_inc["Country/Region"] == location.replace("United States", "US"), :
+        ].reset_index(drop=True)
+        df_death_loc = df_death.loc[
+            df_death["Country/Region"] == location.replace("United States", "US"), :
+        ].reset_index(drop=True)
+        df_rec_loc = df_rec.loc[
+            df_rec["Country/Region"] == location.replace("United States", "US"), :
+        ].reset_index(drop=True)
+    else:
+        df_inc_loc = df_inc
+        df_death_loc = df_death
+        df_rec_loc = df_rec
 
     # date_resample_type = 'mva'
-    dates_inc, inc_data = preprocCases(df=df_inc, resample_type=date_resample_type)
+    dates_inc, inc_data = preprocCases(df=df_inc_loc, resample_type=date_resample_type)
     dates_death, death_data = preprocCases(
-        df=df_death, resample_type=date_resample_type
+        df=df_death_loc, resample_type=date_resample_type
     )
-    dates_rec, rec_data = preprocCases(df=df_rec, resample_type=date_resample_type)
+    dates_rec, rec_data = preprocCases(df=df_rec_loc, resample_type=date_resample_type)
 
     rec_fig = createCovidIncidentsFig(dates_rec, rec_data, "Recoveries")
     inc_fig = createCovidIncidentsFig(dates_inc, inc_data, "Cases")
