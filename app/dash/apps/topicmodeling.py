@@ -57,6 +57,7 @@ layout = html.Div(
 # ======================================================================================================================
 # CALLBACKS
 # ======================================================================================================================
+# ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
     [Output("dataset-title", "children")],
     [
@@ -76,6 +77,34 @@ def set_dataset_title(options, value_chosen):
 # ----------------------------------------------------------------------------------------------------------------------
 @app.callback(
     [
+        Output("location-drop-down", "options"),
+    ],
+    [
+        Input("dataset-drop-down", "value"),
+        Input("pub-start-date", "date"),
+        Input("pub-end-date", "date"),
+    ],
+)
+def set_dataset_title(dataset_name, start_date, end_date):
+
+    df = dataset2df[dataset_name]
+
+    df_dates = df.loc[df["publish_time"].between(start_date, end_date), :].reset_index(
+        drop=True
+    )
+
+    locations = ["Worldwide"] + df_dates["location"].unique().tolist()
+
+    options_location = getDropDownLocations(locations)
+
+    return [
+        options_location,
+    ]
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+@app.callback(
+    [
         Output("topic-time-dist", "figure"),
         Output("topics-bar", "figure"),
         Output("topic-kws-table", "children"),
@@ -86,10 +115,11 @@ def set_dataset_title(options, value_chosen):
         Input("pub-start-date", "date"),
         Input("pub-end-date", "date"),
         Input("time-radio-buttons", "value"),
+        Input("location-drop-down", "value"),
     ],
 )
 def update_by_subclass(
-    dataset_name, class_subclass, start_date, end_date, date_resample_type
+    dataset_name, class_subclass, start_date, end_date, date_resample_type, location
 ):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
@@ -100,14 +130,22 @@ def update_by_subclass(
     # df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
     df = dataset2df[dataset_name]
 
+    # filter by location
+    if location != "Worldwide":
+        df = df.loc[df["location"] == location, :].reset_index(drop=True)
+
+    # filter by date period
     df_dates = df.loc[df["publish_time"].between(start_date, end_date), :].reset_index(
         drop=True
     )
 
-    # print(df_dates.head(10))
-    # print(df_dates["publish_time"].min())
+    classes_subclasses = [
+        col for col in df_dates.columns if "topic" in col and "kw" not in col
+    ]
 
-    classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
+    classes_topics_descr = getClassesDescriptionMap(
+        df_dates, date_resample_type, classes_subclasses
+    )
 
     topics_descr = classes_topics_descr[class_subclass]
 
@@ -150,7 +188,6 @@ def update_by_deaths_inc_rec(date_resample_type):
     [
         Output("table-papers", "children"),
         Output("topic-drop-down", "options"),
-        Output("location-drop-down", "options"),
     ],
     [
         Input("dataset-drop-down", "value"),
@@ -175,7 +212,13 @@ def update_by_topic(
         drop=True
     )
 
-    classes_topics_descr = getClassesDescriptionMap(df_dates, date_resample_type)
+    classes_subclasses = [
+        col for col in df_dates.columns if "topic" in col and "kw" not in col
+    ]
+
+    classes_topics_descr = getClassesDescriptionMap(
+        df_dates, date_resample_type, classes_subclasses
+    )
 
     children = getPapers(class_subclass, topics, df_dates)
 
@@ -185,12 +228,9 @@ def update_by_topic(
 
     values = [i["value"] for i in options_topics]
 
-    options_location = getDropDownLocations(df_dates["location"].unique())
-
     return (
         children,
         options_topics,
-        options_location,
     )
 
 

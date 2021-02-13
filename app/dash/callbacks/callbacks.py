@@ -48,7 +48,9 @@ def getTopicFig(class_subclass, topics_descr):
                 y=topics_descr["topic_" + str(topic_num)]["counts"],
                 name=topics_descr["topic_" + str(topic_num)]["name"],
             )
-            for topic_num in range(len(topics_descr))
+            for topic_num in sorted(
+                [int(key.replace("topic_", "")) for key in topics_descr.keys()]
+            )
         ],
         layout=dict(
             title="TOPIC TIME EVOLUTION"

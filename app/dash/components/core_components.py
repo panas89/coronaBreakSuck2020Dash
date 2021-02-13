@@ -85,7 +85,7 @@ location_dd = html.Div(
             #     for country in LOCATIONS_COUNTRIES
             #     if isinstance(country, str)
             # ],
-            value="MTL",
+            value="Worldwide",
             persistence=True,
             persistence_type="local",
         ),

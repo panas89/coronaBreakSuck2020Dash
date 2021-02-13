@@ -22,7 +22,7 @@ def resamplePubTimes(df, resample_type) -> (list, list):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-def getClassesDescriptionMap(df, resample_type) -> dict:
+def getClassesDescriptionMap(df, resample_type, CLASSES_SUBCLASSES) -> dict:
     """Cr"""
     classes_topics_descr = defaultdict(dict)
     for class_subclass in CLASSES_SUBCLASSES:
@@ -78,11 +78,21 @@ def getTopicsBarChart(classes_topics_descr, class_subclass):
     """Method to plot bar chart of topics"""
     x_axis_vals = [
         classes_topics_descr[class_subclass]["topic_" + str(num)]["name"]
-        for num, _ in enumerate(classes_topics_descr[class_subclass])
+        for num in sorted(
+            [
+                int(key.replace("topic_", ""))
+                for key in classes_topics_descr[class_subclass].keys()
+            ]
+        )
     ]
     y_axis_vals = [
         np.sum(classes_topics_descr[class_subclass]["topic_" + str(num)]["counts"])
-        for num, _ in enumerate(classes_topics_descr[class_subclass])
+        for num in sorted(
+            [
+                int(key.replace("topic_", ""))
+                for key in classes_topics_descr[class_subclass].keys()
+            ]
+        )
     ]
 
     fig = go.Figure(
