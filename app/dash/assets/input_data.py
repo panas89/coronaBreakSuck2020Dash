@@ -27,8 +27,8 @@ def getColsToRead(filepath):
         "title",
         "abstract",
         "publish_time",
-        "affiliations_country",  # 'doi',
-        "location_country",
+        "location",
+        "doi",
     ] + [col for col in df_cols.columns.tolist() if "topic" in col]
     return cols
 
@@ -85,8 +85,10 @@ for path in os.listdir(TOPIC_DIR):
     name = " ".join(raw_name.split("_")).title()
     # load dataset and store to dict
     try:
-        dataset2df[name] = load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
-        load_topic_modeling_data(full_path, COLS_TO_READ, MAX_DATE)
+        cols_to_read = getColsToRead(full_path)
+        print(cols_to_read)
+        dataset2df[name] = load_topic_modeling_data(full_path, cols_to_read, MAX_DATE)
+        # load_topic_modeling_data(full_path, cols_to_read, MAX_DATE)
         topic_dataset_name2path[name] = full_path
 
         print("GOOD", full_path)

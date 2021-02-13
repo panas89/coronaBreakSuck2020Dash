@@ -20,13 +20,13 @@ dataset_dd = html.Div(
             options=[
                 dict(
                     label=name,
-                    value=file_path,
+                    value=name,
                     title="TODO: add information about dataset",
                 )
-                for name, file_path in topic_dataset_name2path.items()
+                for name in topic_dataset_name2path.keys()
             ],
             placeholder="Select Dataset",
-            value=list(topic_dataset_name2path.values())[0],
+            value=list(topic_dataset_name2path.keys())[0],
             persistence=True,
             persistence_type="local",
             clearable=False,

@@ -66,7 +66,9 @@ layout = html.Div(
 )
 def set_dataset_title(options, value_chosen):
 
-    dataset_title = [x["label"] for x in options if x["value"] == value_chosen][0]
+    dataset_title = (
+        value_chosen  # [x["label"] for x in options if x["value"] == value_chosen][0]
+    )
 
     return [dataset_title.upper()]
 
@@ -87,7 +89,7 @@ def set_dataset_title(options, value_chosen):
     ],
 )
 def update_by_subclass(
-    dataset_path, class_subclass, start_date, end_date, date_resample_type
+    dataset_name, class_subclass, start_date, end_date, date_resample_type
 ):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
@@ -95,7 +97,8 @@ def update_by_subclass(
 
     # df_dates = df.loc[df['publish_time'].between(dates[0], dates[1]),:].reset_index(drop=True)
 
-    df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
+    # df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
+    df = dataset2df[dataset_name]
 
     df_dates = df.loc[df["publish_time"].between(start_date, end_date), :].reset_index(
         drop=True
@@ -159,13 +162,14 @@ def update_by_deaths_inc_rec(date_resample_type):
     ],
 )
 def update_by_topic(
-    dataset_path, class_subclass, topics, start_date, end_date, date_resample_type
+    dataset_name, class_subclass, topics, start_date, end_date, date_resample_type
 ):
 
     # dates = pd.to_datetime([str(df['publish_time'].min() + datetime.timedelta(days=date))[:10]
     #                         for date in dates])
 
-    df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
+    # df = load_topic_modeling_data(dataset_path, COLS_TO_READ, MAX_DATE)
+    df = dataset2df[dataset_name]
 
     df_dates = df.loc[df["publish_time"].between(start_date, end_date), :].reset_index(
         drop=True
