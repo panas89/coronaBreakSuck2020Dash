@@ -16,23 +16,23 @@ import plotly.graph_objects as go
 # ======================================================================================================================
 # TOPIC MODELING
 # ======================================================================================================================
-def createTopicModelingDf(
-    file_path, cols_to_read=COLS_TO_READ, max_date=MAX_DATE
-) -> pd.DataFrame:
+# def createTopicModelingDf(
+#     file_path, cols_to_read=[], max_date=MAX_DATE
+# ) -> pd.DataFrame:
 
-    # Load data
-    df = pd.read_csv(file_path, parse_dates=["publish_time"], usecols=cols_to_read)
+#     # Load data
+#     df = pd.read_csv(file_path, parse_dates=["publish_time"], usecols=cols_to_read)
 
-    # Create DOI col
-    # df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
+#     # Create DOI col
+#     # df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
 
-    # Create date col
-    df["date"] = [date.strftime("%m-%d-%Y") for date in df["publish_time"]]
+#     # Create date col
+#     df["date"] = [date.strftime("%m-%d-%Y") for date in df["publish_time"]]
 
-    # Fix unknown/wrong publication datetimes to today
-    df.loc[df["publish_time"] > max_date, "publish_time"] = max_date
+#     # Fix unknown/wrong publication datetimes to today
+#     df.loc[df["publish_time"] > max_date, "publish_time"] = max_date
 
-    return df
+#     return df
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -178,8 +178,24 @@ def getDropDownTopics(classes_topics_descr, class_subclass):
                 "name"
             ],
         }
-        for topic_num in range(len(classes_topics_descr[class_subclass]))
+        for topic_num in sorted(
+            [
+                int(key.replace("topic_", ""))
+                for key in classes_topics_descr[class_subclass].keys()
+            ]
+        )
     ]
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+def getDropDownClassesSubclasses(classes_subclasses):
+
+    return (
+        [
+            dict(label=format_class_subclass(c_s), value=c_s)
+            for c_s in classes_subclasses
+        ],
+    )
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -33,26 +33,10 @@ def getColsToRead(filepath):
     return cols
 
 
-df_cols = pd.read_csv(
-    "app/dash/data/topicmodeling/semantic_scholar.csv",
-    parse_dates=["publish_time"],
-    nrows=1,
-)
-
-COLS_TO_READ = ["sha", "title", "abstract", "publish_time", "location", "doi",] + [
-    "risk_factor_topic",
-    "risk_factor_topic_kw",
-    "treatment_and_vaccine_topic",
-    "treatment_and_vaccine_topic_kw",
-    "treatment_and_vaccine_common_name_topic_kw",
-]
-
 TABLE_COLS = ["title", "abstract", "publish_time", "location", "doi"]
 
-CLASSES_SUBCLASSES = [col for col in COLS_TO_READ if "topic" in col and "kw" not in col]
 
 MAX_DATE = pd.to_datetime("today")
-print(MAX_DATE)
 MAX_WEEK = MAX_DATE.isocalendar()[1]
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -61,7 +45,7 @@ def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
     df = pd.read_csv(file_path, parse_dates=["publish_time"], usecols=cols_to_read)
 
     # Create DOI col
-    # df['doi'] = ['https://doi.org/'+str(doi) for doi in df['doi'] if doi!=np.nan]
+    df["doi"] = ["https://doi.org/" + str(doi) for doi in df["doi"] if doi != np.nan]
 
     # Create date col
     df["date"] = [date.strftime("%m-%d-%Y") for date in df["publish_time"]]
@@ -86,27 +70,12 @@ for path in os.listdir(TOPIC_DIR):
     # load dataset and store to dict
     try:
         cols_to_read = getColsToRead(full_path)
-        print(cols_to_read)
         dataset2df[name] = load_topic_modeling_data(full_path, cols_to_read, MAX_DATE)
-        # load_topic_modeling_data(full_path, cols_to_read, MAX_DATE)
         topic_dataset_name2path[name] = full_path
 
         print("GOOD", full_path)
     except Exception as e:
         print("BAD", full_path, "\n", e)
-
-# # Create dataset name,file_path dict for Topic Modeling
-# topic_dataset_name2path = {}
-# for path in os.listdir(TOPIC_DIR):
-
-#     # create file_path
-#     full_path = os.path.join(TOPIC_DIR, path)
-
-#     # create dataset name
-#     raw_name = path.split('.')[0]  # remove .csv
-#     name = " ".join(raw_name.split('_')).title()
-
-#     topic_dataset_name2path[name] = full_path
 
 # Load Forecasting Data
 df_inc = pd.read_csv(INCIDENTS_PATH, parse_dates=True)
@@ -115,15 +84,8 @@ df_rec = pd.read_csv(RECOVERED_PATH, parse_dates=True)
 
 # Global Definitions
 DATASET_NAMES = list(topic_dataset_name2path.keys())
-LOCATIONS_COUNTRIES = df_inc["Country/Region"].unique()
+# LOCATIONS_COUNTRIES = df_inc["Country/Region"].unique()
 
-# ##################################################################################################
-# # Relation table data
-# RELATION_PATH = './data/relations/classified_dims_Publications_hi_90_95_covid_relation.csv'
-# RELATION_TABLE_COLS = ['title','publish_time','relations']
-
-# # load relation data
-# df_relations = pd.read_csv(RELATION_PATH)
 
 # ##################################################################################################
 
@@ -138,16 +100,6 @@ for path in os.listdir(NRE_DIR):
     name = " ".join(raw_name.split("_")).title()
 
     nre_dataset_name2path[name] = full_path
-
-# print(nre_dataset_name2path)
-# filenames = glob.glob("data/relations/*.csv")
-# meaningfull_filenames = [
-#     "Top 5-10\% High impact papers",
-#     # "Semantic scholar COVID-19 papers",
-#     # "COVID-19 Clinical Trials",
-#     "Top 5\% High impact papers",
-# ]
-
 
 # Create data dictionary from yaml
 yaml_path = os.path.join(DASH_DIR, "assets/Davids_interest_meshed.yaml")

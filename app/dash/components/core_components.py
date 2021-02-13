@@ -57,10 +57,10 @@ class_subclass_dd = html.Div(
         html.Label("Medical Category"),
         dcc.Dropdown(
             id="class-subclass-drop-down",
-            options=[
-                dict(label=format_class_subclass(c_s), value=c_s)
-                for c_s in CLASSES_SUBCLASSES
-            ],
+            # options=[
+            #     dict(label=format_class_subclass(c_s), value=c_s)
+            #     for c_s in CLASSES_SUBCLASSES
+            # ],
             value="risk_factor_topic",
             persistence=True,
             persistence_type="local",

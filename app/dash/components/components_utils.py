@@ -10,6 +10,17 @@ def format_class_subclass(x) -> str:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+
+
+def getClassesSubclassesList(df) -> list:
+    return [
+        col
+        for col in df.columns
+        if "topic" in col and "kw" not in col and "common" not in col
+    ]
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 def resamplePubTimes(df, resample_type) -> (list, list):
 
     temp_df = df[["publish_time"]].groupby(df["publish_time"]).count()
