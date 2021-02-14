@@ -12,12 +12,14 @@ WORKDIR /
 
 RUN pip3 install -r requirements.txt
 
+RUN python3 -m spacy download en_core_web_sm
+
 COPY . /
 
 RUN bash ./install_opennre.sh
 
 # UNCOMMENT when running locally, to expose app on a port
-EXPOSE 8050
+EXPOSE 5000
 
 ENTRYPOINT [ "python3" ]
 
