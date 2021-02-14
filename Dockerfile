@@ -19,7 +19,7 @@ COPY . /
 RUN bash ./install_opennre.sh
 
 # UNCOMMENT when running locally, to expose app on a port
-EXPOSE 5000
+# EXPOSE 5000
 
 ENTRYPOINT [ "python3" ]
 

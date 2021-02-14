@@ -3,7 +3,8 @@
 
 # Login into heroku (for mac add an underscore after=: --username=_ --)
 # docker login --username=_ --password=`heroku auth:token 2> stdout` registry.heroku.com
-docker login --username= --password=`heroku auth:token 2> stdout` registry.heroku.com
+# For Linux
+heroku container:login
 
 # Build image
 docker build -t registry.heroku.com/covidinsights/web -f ./Dockerfile .
