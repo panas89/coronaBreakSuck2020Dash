@@ -25,7 +25,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 import glob
 
-filenames = glob.glob("app/dash/data/relationship_extraction/*.csv")
+filenames = glob.glob("app/dash/data/nre/*.csv")
 meaningfull_filenames = [
     "Top 5-10\% High impact papers",
     "Semantic scholar COVID-19 papers",

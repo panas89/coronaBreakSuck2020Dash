@@ -135,6 +135,9 @@ vasilis/
 # microsoft word components
 *docx#
 
+# stdout
+stdout
+
 # johnny personal file
 notebooks/main_kch_tmp.ipynb
 

@@ -19,3 +19,11 @@ Python executable from the virtualenv:
 Use `make image` to create a Docker image. Then, follow [these 
 instructions](https://www.chrisvoncsefalvay.com/2019/08/28/deploying-dash-on-amazon-ecs/) 
 to deploy the image on ECS.
+
+## Deploy on Heroku
+
+#### Notes
+
+- in deploy.sh  uncomment lines for each operating system
+- in Dockerfile uncomment "EXPOSE 5000", when container on cloud
+- in index.py when in container change to production, set "debug=False"
