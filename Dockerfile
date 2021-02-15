@@ -10,13 +10,13 @@ COPY ./requirements.txt /requirements.txt
 
 WORKDIR /
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt 
 
-RUN python3 -m spacy download en_core_web_sm
+# RUN python3 -m spacy download en_core_web_sm
 
 COPY . /
 
-RUN bash ./install_opennre.sh
+# RUN bash ./install_opennre.sh
 
 # UNCOMMENT when running locally, to expose app on a port
 # EXPOSE 5000

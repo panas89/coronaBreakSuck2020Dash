@@ -37,7 +37,7 @@ murmurhash==1.0.4
 nltk==3.4.5
 numexpr==2.7.1
 numpy==1.19.0
--e git+https://github.com/thunlp/OpenNRE.git@c40c680f65df6b9f20080023cf41402232e42625#egg=opennre
+# -e git+https://github.com/thunlp/OpenNRE.git@c40c680f65df6b9f20080023cf41402232e42625#egg=opennre
 packaging==20.4
 pandas==1.0.5
 parso==0.7.0
@@ -70,7 +70,7 @@ spacy==2.3.2
 srsly==1.0.3
 thinc==7.4.1
 tokenizers==0.9.0
-torch==1.6.0
+# torch==1.6.0
 tqdm==4.51.0
 traitlets==4.3.3
 transformers==3.4.0
