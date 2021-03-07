@@ -314,7 +314,7 @@ def getKW_RE_plot(df, kws):
 
     fig = go.Figure(
         data=go.Scatter(
-            x=df_grps["publish_month"],
+            x=df_grps["publish_time"],
             y=df_grps["proba_mean"],
             error_y=dict(
                 type="data",  # value of error bar given in data coordinates

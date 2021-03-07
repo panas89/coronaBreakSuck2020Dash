@@ -4,6 +4,7 @@ This is the module to store all the specialized functions for relation visualiza
 import pandas as pd
 import ast
 
+
 def preprocess_df(df_r):
     """
     Prepare the raw relation dataframe from the data file (i.e., classified_merged_covid_relation.csv)
@@ -132,7 +133,7 @@ def preproces_for_kws_specific_plot(df_new, kws, relations=["is related to"]):
         ]
 
         # aggregated data
-        grp = df_sg.groupby(df_sg["publish_time"].dt.strftime("%B"))["probability"]
+        grp = df_sg.groupby(df_sg["publish_time"])["probability"]  # .dt.strftime("%B")
         statistics = [grp.mean(), grp.std(), grp.sem(), grp.count()]
         df_grp = pd.DataFrame(statistics).transpose()
         df_grp.columns = ["proba_mean", "proba_std", "proba_stderr", "n"]
