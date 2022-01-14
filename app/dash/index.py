@@ -6,7 +6,7 @@ import os
 from assets.styling import *
 
 from app import app
-from apps import topicmodeling, about, homepage, nre #, rextractor
+from apps import topicmodeling, about, homepage, nre  # , rextractor
 
 # ======================================================================================================================
 # HEADER

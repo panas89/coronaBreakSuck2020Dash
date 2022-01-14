@@ -311,6 +311,7 @@ def getKW_RE_plot(df, kws):
     """Method to get line plot of kw relationship over time."""
 
     df_grps = rvis.preproces_for_kws_specific_plot(df, kws=kws)
+    df_grps.reset_index(drop=False, inplace=True)
 
     fig = go.Figure(
         data=go.Scatter(
