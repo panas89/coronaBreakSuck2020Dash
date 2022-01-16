@@ -21,7 +21,7 @@ dataset_dd = html.Div(
                 dict(
                     label=name,
                     value=name,
-                    title="TODO: add information about dataset",
+                    title=topic_dataset_name2description[name],
                 )
                 for name in topic_dataset_name2path.keys()
             ],
@@ -316,9 +316,7 @@ nre_dataset_dd = html.Div(
         dcc.Dropdown(
             id="nre-dataset-dd",
             options=[
-                dict(
-                    label=name, value=path, title="TODO: add information about dataset"
-                )
+                dict(label=name, value=path, title=nre_dataset_name2description[name])
                 for name, path in nre_dataset_name2path.items()
             ],
             placeholder="Select Dataset",
@@ -434,9 +432,7 @@ rextractor_dataset_dd = html.Div(
         dcc.Dropdown(
             id="rextractor-dataset-dd",
             options=[
-                dict(
-                    label=name, value=path, title="TODO: add information about dataset"
-                )
+                dict(label=name, value=path, title="nre_dataset_name2description[name]")
                 for name, path in topic_dataset_name2path.items()
             ],
             placeholder="Select Dataset",

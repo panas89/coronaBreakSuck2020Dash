@@ -58,6 +58,24 @@ def load_topic_modeling_data(file_path, cols_to_read, max_date) -> pd.DataFrame:
 
 # ######################################################################################################################
 # Load Topic Modeling Data
+topic_dataset_name2description = {}
+
+topic_dataset_name2description[
+    "Publications Hi 95 100"
+] = "Top 95-100% most impactful papers (defined using the altmetric score). Source: Dimensions AI "
+topic_dataset_name2description[
+    "Clinical Trials"
+] = "All published clinical trials. Source: Dimensions AI "
+topic_dataset_name2description[
+    "Publications Hi 90 95"
+] = "Top 90-95% most impactful papers (defined using the altmetric score). Source: Dimensions AI "
+topic_dataset_name2description[
+    "Semantic Scholar"
+] = "All COVID-19 related papers published. Source: Semantic Scholar"
+topic_dataset_name2description[
+    "Grants"
+] = "All COVID-19 related published grants. Source: Dimensions AI"
+
 dataset2df = {}
 topic_dataset_name2path = {}
 for path in os.listdir(TOPIC_DIR):
@@ -90,6 +108,25 @@ DATASET_NAMES = list(topic_dataset_name2path.keys())
 # ##################################################################################################
 
 # Load NRE data
+nre_dataset_name2description = {}
+
+nre_dataset_name2description[
+    "Publications Hi 95 100"
+] = "Top 95-100% most impactful papers (defined using the altmetric score). Source: Dimensions AI"
+nre_dataset_name2description[
+    "Clinical Trials"
+] = "All published clinical trials. Source: Dimensions AI"
+nre_dataset_name2description[
+    "Publications Hi 90 95"
+] = "Top 90-95% most impactful papers (defined using the altmetric score). Source: Dimensions AI"
+nre_dataset_name2description[
+    "Semantic Scholar"
+] = "All COVID-19 related papers published. Source: Semantic Scholar "
+nre_dataset_name2description[
+    "Grants"
+] = "All COVID-19 related published grants. Source: Dimensions AI"
+
+
 nre_dataset_name2path = {}
 for path in os.listdir(NRE_DIR):
     # create file_path
@@ -100,6 +137,8 @@ for path in os.listdir(NRE_DIR):
     name = " ".join(raw_name.split("_")).title()
 
     nre_dataset_name2path[name] = full_path
+    print(nre_dataset_name2description[name])
+
 
 # Create data dictionary from yaml
 yaml_path = os.path.join(DASH_DIR, "assets/Davids_interest_meshed.yaml")
